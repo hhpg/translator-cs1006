@@ -1,12 +1,13 @@
 import org.atteo.evo.inflector.English;
 
-import java.util.Scanner; /* need to import scanner to get user input */
-import java.io.BufferedReader; /* .io.* to be able to read from .csv file */
-import java.util.ArrayList; /* array list to store translated tokens */
-import java.io.IOException; /* exception needs to be thrown */
-import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.lang.Math.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+/* this is a test */
 
 public class translate {
     private ArrayList < word > translatedTokens = new ArrayList < > (); /* array list that stores the value of the translated tokens */
@@ -80,16 +81,13 @@ public class translate {
                 }
                 if (counter == 0 && token.equals(data)) {
                     counter++;
-                    continue;
 
                 } else if (counter == 0 && token.equals(English.plural(data)) && !token.equals("is")) {
                     this.isPlural = true;
                     counter++;
-                    continue;
                 } else if (counter == 0 && token.toLowerCase().equals(data)) {
                     isUpperCase = true;
                     counter++;
-                    continue;
 
                 } else if (counter == 0 & token.toLowerCase().equals(English.plural(data)) && !token.equals("is")){
                     isUpperCase = true;
@@ -328,7 +326,7 @@ public class translate {
     }
 
     private void rule7() {
-        ArrayList < String > pronounList = new ArrayList < String > ();
+        ArrayList < String > pronounList = new ArrayList < > ();
         pronounList.add("es");
         pronounList.add("estoy");
         pronounList.add("estás");
