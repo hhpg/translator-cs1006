@@ -8,7 +8,6 @@ import java.util.Map;
 
 public class translate {
     private ArrayList<word> translatedTokens = new ArrayList<>(); /* array list that stores the value of the translated tokens */
-    private boolean isMasc = true;
     private boolean isPlural = false;
     private Map<String, word> dict = new HashMap<>();
     private String stringToTranslate;
@@ -130,11 +129,11 @@ public class translate {
                     isUpperCase = true;
                     this.isPlural = true;
                     counter++;
-                } else if (counter == 0 && !token.equals(data)) {
+                } else if (counter == 0 && !token.equals(data) && !dict.containsKey(token) && !dict.containsKey(token.toLowerCase())) {
                     if (getLev(token, data)) {
-                        //translatedWord = data;
-                        //counter++;
-                        //continue;
+                        translatedWord = data;
+                        counter += 2;
+                        continue;
                     }
                     break;
                 } else if (counter == 1) {
@@ -205,12 +204,10 @@ public class translate {
     }
 
     private boolean getLev(String tokenToTranslate, String readData) { //Change this, close to finishing
-
         int distance = distance(tokenToTranslate, readData);
         return !dict.containsKey(tokenToTranslate) && distance == 1;
 
     }
-
 
     private int distance(String a, String b) {
         a = a.toLowerCase();
@@ -233,7 +230,6 @@ public class translate {
         return costs[b.length()];
     }
 
-
     public static void main(String[] args) throws IOException {
 
         BufferedReader fileReader = new BufferedReader(new FileReader(args[0]));
@@ -241,6 +237,7 @@ public class translate {
         for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
             new translate(contents);
         }
+
 
     }
 }
