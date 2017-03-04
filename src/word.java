@@ -10,7 +10,6 @@ class word {
         this.isPlural = isPlural;
     }
 
-
     public boolean getIsPlural() {
         return this.isPlural;
     }
