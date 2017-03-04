@@ -1,5 +1,3 @@
-import org.atteo.evo.inflector.English;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -121,14 +119,14 @@ public class translate {
                 if (counter == 0 && token.equals(data)) {
                     counter++;
 
-                } else if (counter == 0 && token.equals(English.plural(data)) && !token.equals("is")) {
+                } else if (counter == 0 && checkPlural(data, token) && !token.equals("is")) {
                     this.isPlural = true;
                     counter++;
                 } else if (counter == 0 && token.toLowerCase().equals(data)) {
                     isUpperCase = true;
                     counter++;
 
-                } else if (counter == 0 & token.toLowerCase().equals(English.plural(data)) && !token.equals("is")) {
+                } else if (counter == 0 && checkPlural(data, token.toLowerCase()) && !token.equals("is")) {
                     isUpperCase = true;
                     this.isPlural = true;
                     counter++;
@@ -179,6 +177,33 @@ public class translate {
 
     }
 
+
+    private boolean checkPlural(String dictWord, String data) {
+
+        if (data.equals(dictWord + "es") && (dictWord.endsWith("ch") || dictWord.endsWith("x") || dictWord.endsWith("s") || dictWord.endsWith("z"))) {
+            return true;
+        } else if (data.equals(dictWord + "s") && dictWord.endsWith("y") && isVowel(dictWord.substring(0, dictWord.length() - 1))) {
+            return true;
+        } else if (dictWord.endsWith("y") && data.equals(dictWord.substring(0, dictWord.length() - 1) + "ies") && !isVowel(dictWord.substring(0, dictWord.length() - 1))) {
+            return true;
+        } else if (data.equals(dictWord + "es") && dictWord.endsWith("o")) {
+            return true;
+        } else if (data.equals(dictWord + "s") && dictWord.endsWith("o")) {
+            return true;
+        } else if (data.equals(dictWord + "s") && !dictWord.endsWith("o") && !dictWord.endsWith("y") && !dictWord.endsWith("ch") && !dictWord.endsWith("x") && !dictWord.endsWith("s") && !dictWord.endsWith("z")) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+    private boolean isVowel(String input) {
+        String vowels = "aeiou";
+        int input_size = input.length();
+        return vowels.contains(input.substring(input_size - 1, input_size));
+    }
+
     private boolean getLev(String tokenToTranslate, String readData) { //Change this, close to finishing
 
         int distance = distance(tokenToTranslate, readData);
@@ -217,6 +242,5 @@ public class translate {
             new translate(contents);
         }
 
-        //new translate("The time is difficult, the hours are hard but I am clear about my life\n");
     }
 }

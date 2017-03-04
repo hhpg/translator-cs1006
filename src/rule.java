@@ -16,7 +16,6 @@ class rule {
                 translatedTokens.get(i).setType("possessive");
             }
         }
-
     }
 
     private void rule1() {
@@ -32,35 +31,27 @@ class rule {
                             translatedTokens.get(i - 1).setName("la");
                         } else if (translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().substring(0, 2).equals("un")) {
                             translatedTokens.get(i - 1).setName("una");
-
                         }
                     }
-
                 } else {
                     isMasc = true;
                     if (i > 0) {
-
                         if (translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().toLowerCase().equals("la")) {
                             translatedTokens.get(i - 1).setName("el");
-
-
                         } else if (translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().substring(0, 1).equals("una")) {
                             translatedTokens.get(i - 1).setName("un");
-
                         }
                     }
                 }
             }
 
             if (!isMasc) { /* feminine;  Rule 1 */
-
                 if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getName().endsWith("o") && (translatedTokens.get(i - 1).getType().equals("noun") ||
                         translatedTokens.get(i - 2).getType().equals("noun") || translatedTokens.get(i - 1).getType().equals("conjunction"))) {
                     adj = translatedTokens.get(i).getName();
                     int size = adj.length();
                     adj = adj.substring(0, size - 1) + "a";
                     translatedTokens.get(i).setName(adj);
-
                 }
 
             } else if (isMasc) { /* masculine */ /* rule 1 */
@@ -83,35 +74,29 @@ class rule {
     private void rule3() {
 
         int article_pos = -1;
-        for (int i = 0; i < translatedTokens.size(); i++) { /* Checks for unordered adjective/noun stuff */
 
+        for (int i = 0; i < translatedTokens.size(); i++) { /* Checks for unordered adjective/noun stuff */
             if (translatedTokens.get(i).getType().equals("article")) {
                 article_pos = i;
             } else if (translatedTokens.get(i).getType().equals("noun") && article_pos >= 0 && (translatedTokens.get(i - 1).getType().equals("adjective") && translatedTokens.get(i - 2).getName().equals("y"))) {
                 word x = translatedTokens.get(i);
                 translatedTokens.add(article_pos + 1, x);
                 translatedTokens.remove(i + 1);
-
             }
-
         }
-            /* if there isn't an article present in the list then the following for loop is executed in */
+        /* if there isn't an article present in the list then the following for loop is executed in */
         for (int i = 1; i < translatedTokens.size(); i++) { /* Checks for unordered adjective/noun stuff */
             if (translatedTokens.get(i).getType().equals("noun") && translatedTokens.get(i - 1).getType().equals("adjective")) {
                 word x = translatedTokens.get(i);
                 word y = translatedTokens.get(i - 1);
-
                 translatedTokens.set(i - 1, x);
                 translatedTokens.set(i, y);
-
             }
-
         }
-
-
     }
 
     private void setPlurals() {
+
         for (int i = 0; i < translatedTokens.size(); i++) {
             if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i - 1).getType().equals("noun") && translatedTokens.get(i - 1).getIsPlural()) {
                 translatedTokens.get(i).setPlural(true);
@@ -152,8 +137,6 @@ class rule {
                 possessive = translatedTokens.get(i).getName();
                 translatedTokens.get(i).makePlural(possessive, i);
             }
-
-
     }
 
     private void rule5() {
@@ -162,35 +145,24 @@ class rule {
                 translatedTokens.get(i + 1).setName("eres");
             } else if (translatedTokens.get(i).getName().equals("nosotros") && translatedTokens.get(i + 1).getName().equals("son")) {
                 translatedTokens.get(i + 1).setName("somos");
-
             }
-
         }
-
-
     }
 
     private void rule6() {
         for (int i = 0; i < translatedTokens.size() - 1; i++) { /* rule 6 */
             if (translatedTokens.get(i).getName().equals("eres") && (translatedTokens.get(i + 1).getType().equals("verb") || translatedTokens.get(i + 1).getName().equals("con"))) {
-
                 translatedTokens.get(i).setName("estás");
             } else if (translatedTokens.get(i).getName().equals("somos") && (translatedTokens.get(i + 1).getType().equals("verb") || translatedTokens.get(i + 1).getName().equals("con"))) {
-
                 translatedTokens.get(i).setName("estamos");
             } else if (translatedTokens.get(i).getName().equals("son") && (translatedTokens.get(i + 1).getType().equals("verb") || translatedTokens.get(i + 1).getName().equals("con"))) {
-
                 translatedTokens.get(i).setName("están");
             } else if (translatedTokens.get(i).getName().equals("soy") && (translatedTokens.get(i + 1).getType().equals("verb") || translatedTokens.get(i + 1).getName().equals("con"))) {
-
                 translatedTokens.get(i).setName("estoy");
             } else if (translatedTokens.get(i).getName().equals("es") && (translatedTokens.get(i + 1).getType().equals("verb") || translatedTokens.get(i + 1).getName().equals("con"))) {
-
                 translatedTokens.get(i).setName("está");
             }
         }
-
-
     }
 
     private void rule7() {
@@ -214,8 +186,6 @@ class rule {
                 // }
             }
         }
-
-
     }
 
     private void swapTokens(String word, String type, int position) {
@@ -223,7 +193,6 @@ class rule {
         translatedTokens.get(position).setType(translatedTokens.get(position - 1).getType());
         translatedTokens.get(position - 1).setName(translatedTokens.get(position - 2).getName());
         translatedTokens.get(position - 1).setType(translatedTokens.get(position - 2).getType());
-
         translatedTokens.get(position - 2).setName(word);
         translatedTokens.get(position - 2).setType(type);
     }
@@ -247,10 +216,7 @@ class rule {
             } else if (translatedTokens.get(i).getName().equals("ellos") && translatedTokens.get(i - 1).getType().equals("verb")) {
                 swapTokens("los", "pronoun", i);
             }
-
         }
-
-
     }
 
     private void rule9() {
@@ -259,17 +225,13 @@ class rule {
                 word neg, verb;
                 neg = translatedTokens.get(i);
                 verb = translatedTokens.get(i - 1);
-
                 translatedTokens.set(i - 1, neg);
-
                 translatedTokens.set(i, verb);
                 // if(translatedTokens.get(i+1).getType().equals("punctuation")) {
                 //   translatedTokens.remove(i+1);
                 // }
             }
         }
-
-
     }
 
     private void rule10() {
@@ -282,8 +244,6 @@ class rule {
                 //if(translatedTokens.get(i).getType().equals("punctuation")) {
                 //  translatedTokens.remove(i);
                 //}
-
-
             } else if (translatedTokens.get(i).getType().equals("preposition") && translatedTokens.get(i + 1).getName().equals("tú")) {
                 translatedTokens.get(i + 1).setName("ti");
             }
@@ -294,11 +254,8 @@ class rule {
                 //if(translatedTokens.get(i).getType().equals("punctuation")) {
                 //  translatedTokens.remove(i);
                 // }
-
             }
         }
-
-
     }
 
     private void grammarRules() {
