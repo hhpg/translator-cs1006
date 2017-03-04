@@ -68,7 +68,7 @@ class word {
             this.name = text + "s";
         } else {
             text = text + "es";
-            this.name = text + "s";
+            this.name = text;
         }
     }
     /*

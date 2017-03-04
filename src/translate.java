@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /* this is a test */
 
@@ -13,33 +15,74 @@ public class translate {
     private ArrayList < word > translatedTokens = new ArrayList < > (); /* array list that stores the value of the translated tokens */
     private boolean isMasc = true;
     private boolean isPlural = false;
-    private boolean begin = true;
+    private Map<String, word> dict = new HashMap<>();
+    private String stringToTranslate;
 
 
-    translate() throws IOException { /* constructor that calls the getInput function when called in order to get the msg to be translated */
+
+    private translate(String stringToTranslate) throws IOException { /* constructor that calls the getInput function when called in order to get the msg to be translated */
+        this.stringToTranslate = stringToTranslate;
         getInput();
+    }
+    private void readDict() throws IOException {
+        BufferedReader fileRead = new BufferedReader(new InputStreamReader(new FileInputStream("dictionary.csv"), "UTF8"));
+        int counter = 0; /* initialises counter to 0 since counter is inspected later */
+        String key = "";
+        String value = "";
+
+        for (String contents = fileRead.readLine(); contents != null; contents = fileRead.readLine()) { /* iterates through all rows in .csv file */
+
+            for (String data: contents.split(",")) { /* iterates through all elements split around a comma (since .csv files seperate fields with commas */
+
+                if (counter == 0) {
+                    key = data;
+                    counter++;
+                }else if (counter == 1) {
+                    value = data;
+                    counter++;
+                }  else if (counter == 2) {
+                    word x = new word();
+                    x.setName(value);
+                    x.setType(data);
+                    dict.put(key, x);
+                    break;
+                }
+
+            }
+            counter = 0;
+        }
     }
 
     private void getInput() throws IOException { /* needs to throw exceptions in order to call translate function */
 
-        System.out.println("ENGLISH TO SPANISH TRANSLATOR");
-        System.out.println("------------------------------");
-        System.out.println("Enter a sentence you would like to translate"); /* default output msg to user */
+        //System.out.println("ENGLISH TO SPANISH TRANSLATOR");
+        //System.out.println("------------------------------");
+        //System.out.println("Enter a sentence you would like to translate"); /* default output msg to user */
 
-        Scanner sc = new Scanner(System.in); /* scanner instance to get input */
-        String input = sc.nextLine(); /* gets user input */
+        readDict();
 
-        String[] tokens = input.split(" ?(?<!\\G)((?<=[^\\p{Punct}])(?=\\p{Punct})|\\b) ?"); /* regex to ensure that punctuation is considered as a token */
+       // Scanner sc = new Scanner(System.in); /* scanner instance to get input */
+        //String input = sc.nextLine(); /* gets user input */
 
-        for (int i = 0; i < tokens.length; i++) { /* iterates through all elements in tokens array and calls the translate function to translate the elements to Spanish if possible */
-            translate(tokens[i]);
+        String[] tokens = stringToTranslate.split(" ?(?<!\\G)((?<=[^\\p{Punct}])(?=\\p{Punct})|\\b) ?"); /* regex to ensure that punctuation is considered as a token */
+
+        for (String token : tokens) { /* iterates through all elements in tokens array and calls the translate function to translate the elements to Spanish if possible */
+            translate(token);
         }
 
         grammarRules(); /* Calls the grammarRules method to enforce all possible grammar rules */
 
-        String punc = ".,:;!?..."; /* Contains punctuation to match to some string */
+
+        printTokens();
 
         System.out.print("\n");
+
+
+    }
+
+    private void printTokens() {
+        String punc = ".,:;!?..."; /* Contains punctuation to match to some string */
+
         for (int i = 0; i < translatedTokens.size(); i++) { /* Iterates through all translated tokens */
             if(i==0) {
                 translatedTokens.get(i).makeUCase();
@@ -47,29 +90,28 @@ public class translate {
             else if (i < translatedTokens.size() - 1 && punc.contains(translatedTokens.get(i + 1).getName())) {
                 System.out.print(translatedTokens.get(i).getName());
                 continue;
-            } else if (translatedTokens.get(i).getIsUCase() == true) {
+            } else if (translatedTokens.get(i).getIsUCase()) {
                 translatedTokens.get(i).makeUCase();
             }
 
-            System.out.print(translatedTokens.get(i).getName() + " ");
+            if(i<translatedTokens.size() - 1) {
+                System.out.print(translatedTokens.get(i).getName() + " ");
+            } else {
+                System.out.print(translatedTokens.get(i).getName());
+            }
 
-        }
-
-        System.out.print("\n");
-
-        for(int i = 0; i < translatedTokens.size(); i++) {
-            System.out.print(translatedTokens.get(i).getType() + " ");
         }
     }
     private void translate(String token) throws IOException { /* needs to throw such exceptions in order to read from given .csv file */
         String punc = ".,:;!?...";
         String translatedWord = "";
-        boolean isUpperCase = false;
+
 
         BufferedReader fileRead = new BufferedReader(new InputStreamReader(new FileInputStream("dictionary.csv"), "UTF8")); /* BufferReader instance used to read the required .csv file */
         int counter = 0; /* initialises counter to 0 since counter is inspected later */
 
         for (String contents = fileRead.readLine(); contents != null; contents = fileRead.readLine()) { /* iterates through all rows in .csv file */
+            boolean isUpperCase = false;
 
             for (String data: contents.split(",")) { /* iterates through all elements split around a comma (since .csv files seperate fields with commas */
                 if (punc.contains(token)) {
@@ -103,22 +145,24 @@ public class translate {
                 } else if (counter == 1) {
                     translatedWord = data;
                     counter++;
-                    continue;
                 } else if (counter == 2) {
                     if (!isUpperCase && this.isPlural) {
                         word x = new word();
                         x.setName(translatedWord);
                         x.setType(data);
+                        x.setPlural(true);
                         translatedTokens.add(x);
                     } else if (!isUpperCase && !this.isPlural) {
                         word x = new word();
                         x.setName(translatedWord);
+                        x.setPlural(false);
                         x.setType(data);
                         translatedTokens.add(x);
                     } else if (isUpperCase && this.isPlural) {
                         word x = new word();
                         x.setName(translatedWord);
                         x.setType(data);
+                        x.setPlural(true);
                         x.isUCase(true);
                         translatedTokens.add(x);
                     } else if (isUpperCase && !this.isPlural) {
@@ -126,12 +170,14 @@ public class translate {
                         x.setName(translatedWord);
                         x.setType(data);
                         x.isUCase(true);
+                        x.setPlural(false);
                         translatedTokens.add(x);
                     }
                     return;
                 }
 
             }
+            this.isPlural=false;
         }
 
     }
@@ -139,7 +185,7 @@ public class translate {
     private boolean getLev(String tokenToTranslate, String readData) { //Change this, close to finishing
 
         int distance = distance(tokenToTranslate, readData);
-        return distance == 1;
+        return !dict.containsKey(tokenToTranslate) && distance == 1;
 
     }
     private void rule0() {
@@ -153,34 +199,13 @@ public class translate {
 
     }
 
-    private void mascOrFem(int pos) {
-
-
-    /*
-    private void listToString(ArrayList<word> tokens) {
-        String x, y = "";
-
-        ArrayList<Integer> indeces = new ArrayList<Integer>();
-        for (int i = 0; i < tokens.size(); i++) {
-            if (tokens.get(i).getName().equals("conjunction")) {
-                indeces.add(i);
-
-            }
-
-
-        }
-
-*/
-    }
-
     private void rule1() {
         String adj, noun;
-
 
         for (int i = 0; i < translatedTokens.size(); i++) {
             if (translatedTokens.get(i).getType().equals("noun")) {
                 noun = translatedTokens.get(i).getName();
-                if (noun.endsWith("a") || noun.endsWith("d") || noun.endsWith("z") || noun.endsWith("-ión")) {
+                if (noun.endsWith("a") || noun.endsWith("d") || noun.endsWith("z") || noun.endsWith("ión")) {
                     isMasc = false;
                     if(i>0) {
                         if (translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().toLowerCase().equals("el")) {
@@ -209,23 +234,23 @@ public class translate {
 
             if (!this.isMasc) { /* feminine;  Rule 1 */
 
-                  if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getName().endsWith("o")) {
+                if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getName().endsWith("o") &&(translatedTokens.get(i-1).getType().equals("noun") ||
+                    translatedTokens.get(i-2).getType().equals("noun") || translatedTokens.get(i-1).getType().equals("conjunction"))) {
                     adj = translatedTokens.get(i).getName();
                     int size = adj.length();
                     adj = adj.substring(0, size - 1) + "a";
                     translatedTokens.get(i).setName(adj);
-                    continue;
 
                 }
 
             } else if (this.isMasc) { /* masculine */ /* rule 1 */
 
-                  if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getName().endsWith("o")) {
+                if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getName().endsWith("o") &&(translatedTokens.get(i-1).getType().equals("noun") ||
+                        translatedTokens.get(i-2).getType().equals("noun") || translatedTokens.get(i-1).getName().equals("y"))) {
                     adj = translatedTokens.get(i).getName();
                     int size = adj.length();
                     adj = adj.substring(0, size - 1) + "o";
                     translatedTokens.get(i).setName(adj);
-                    continue;
 
 
                 }
@@ -234,9 +259,13 @@ public class translate {
 
 
         }
+
+
+
     }
 
     private void rule3() {
+
         int article_pos = -1;
         for (int i = 0; i < translatedTokens.size(); i++) { /* Checks for unordered adjective/noun stuff */
 
@@ -244,52 +273,78 @@ public class translate {
                 article_pos = i;
             }
 
-            else if (translatedTokens.get(i).getType().equals("noun") && article_pos >=0) {
+            else if (translatedTokens.get(i).getType().equals("noun") && article_pos >=0 && (translatedTokens.get(i-1).getType().equals("adjective") && translatedTokens.get(i-2).getName().equals("y"))) {
                 word x = translatedTokens.get(i);
                 translatedTokens.add(article_pos+1, x);
                 translatedTokens.remove(i+1);
 
             }
 
-            }
+        }
             /* if there isn't an article present in the list then the following for loop is executed in */
-            for (int i = 1; i < translatedTokens.size(); i++) { /* Checks for unordered adjective/noun stuff */
-                if (translatedTokens.get(i).getType().equals("noun") && translatedTokens.get(i-1).getType().equals("adjective")) {
-                    word x = translatedTokens.get(i);
-                    word y = translatedTokens.get(i-1);
+        for (int i = 1; i < translatedTokens.size(); i++) { /* Checks for unordered adjective/noun stuff */
+            if (translatedTokens.get(i).getType().equals("noun") && translatedTokens.get(i-1).getType().equals("adjective")) {
+                word x = translatedTokens.get(i);
+                word y = translatedTokens.get(i-1);
 
-                    translatedTokens.set(i-1, x);
-                    translatedTokens.set(i, y);
-
-                }
+                translatedTokens.set(i-1, x);
+                translatedTokens.set(i, y);
 
             }
-
 
         }
 
 
-    private void rule2And4() {
-        String noun, adj, article, possessive;
-        for (int i = 0; i < translatedTokens.size(); i++) { /* Rule 2 and 4 */
 
-            if (translatedTokens.get(i).getType().equals("adjective") && this.isPlural) {
+
+
+    }
+
+    private void setPlurals() {
+        for (int i = 0; i < translatedTokens.size(); i++) {
+            if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i-1).getType().equals("noun") && translatedTokens.get(i - 1).getIsPlural()) {
+                translatedTokens.get(i).setPlural(true);
+            } else if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i-2).getType().equals("noun") && translatedTokens.get(i - 2).getIsPlural()) {
+                translatedTokens.get(i).setPlural(true);
+            }
+            else if (translatedTokens.get(i).getType().equals("article")  && isMasc && translatedTokens.get(i+1).getType().equals("noun") && translatedTokens.get(i+1).getIsPlural()) {
+                translatedTokens.get(i).setPlural(true);
+            } else if (translatedTokens.get(i).getType().equals("article")  && !isMasc && translatedTokens.get(i+1).getType().equals("noun") && translatedTokens.get(i+1).getIsPlural()) {
+                translatedTokens.get(i).setPlural(true);
+            } else if (translatedTokens.get(i).getType().equals("possessive") && translatedTokens.get(i+1).getIsPlural()) {
+                translatedTokens.get(i).setPlural(true);
+            }
+        }
+     }
+
+    private void rule2And4() {
+
+        setPlurals();
+        String noun, adj, article, possessive;
+        /* Rule 2 and 4 */
+        for (int i = 0; i < translatedTokens.size(); i++)
+            if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getIsPlural()) {
                 adj = translatedTokens.get(i).getName();
                 translatedTokens.get(i).makePlural(adj, i);
-            } else if (translatedTokens.get(i).getType().equals("article") && this.isPlural&& isMasc) {
+            }
+             else if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getIsPlural()) {
+                adj = translatedTokens.get(i).getName();
+                translatedTokens.get(i).makePlural(adj, i);            }
+            else if (translatedTokens.get(i).getType().equals("article") && isMasc && translatedTokens.get(i).getIsPlural()) {
                 article = "los";
                 translatedTokens.get(i).setName(article);
-            } else if (translatedTokens.get(i).getType().equals("article") && this.isPlural && !isMasc) {
+            } else if (translatedTokens.get(i).getType().equals("article") && !isMasc && translatedTokens.get(i).getIsPlural()) {
                 article = "las";
                 translatedTokens.get(i).setName(article);
-            } else if (translatedTokens.get(i).getType().equals("noun") && this.isPlural) {
+            } else if (translatedTokens.get(i).getType().equals("noun") && translatedTokens.get(i).getIsPlural()) {
                 noun = translatedTokens.get(i).getName();
                 translatedTokens.get(i).makePlural(noun, i);
-            } else if (translatedTokens.get(i).getType().equals("possessive") && this.isPlural) {
+            } else if (translatedTokens.get(i).getType().equals("possessive") &&  translatedTokens.get(i).getIsPlural()) {
                 possessive = translatedTokens.get(i).getName();
                 translatedTokens.get(i).makePlural(possessive, i);
             }
-        }
+
+
     }
 
     private void rule5() {
@@ -302,6 +357,9 @@ public class translate {
             }
 
         }
+
+
+
     }
 
     private void rule6() {
@@ -323,6 +381,9 @@ public class translate {
                 translatedTokens.get(i).setName("está");
             }
         }
+
+
+
     }
 
     private void rule7() {
@@ -333,15 +394,22 @@ public class translate {
         pronounList.add("está");
         pronounList.add("estamos");
         pronounList.add("están");
+        pronounList.add("eres");
+        pronounList.add("son");
+        pronounList.add("somos");
+        pronounList.add("soy");
+
 
         for (int i = 0; i < translatedTokens.size() - 1; i++) {
-            if (translatedTokens.get(i).getType().equals("pronoun") && pronounList.contains(translatedTokens.get(i + 1).getName()) && i != translatedTokens.size() - 2) {
+            if (translatedTokens.get(i).getType().equals("pronoun") && pronounList.contains(translatedTokens.get(i + 1).getName())) {
                 translatedTokens.remove(i);
-                if(translatedTokens.get(i+1).getType().equals("punctuation")) {
-                    translatedTokens.remove(i+1);
-                }
+               // if(translatedTokens.get(i+1).getType().equals("punctuation")) {
+                   // translatedTokens.remove(i+1);
+               // }
             }
         }
+
+
     }
 
     private void swapTokens(String word, String type, int position) {
@@ -375,48 +443,58 @@ public class translate {
             }
 
         }
+
+
     }
 
     private void rule9() {
-        for (int i = 1; i < translatedTokens.size(); i++) {
+        for (int i = 1; i < translatedTokens.size() - 1; i++) {
             if (translatedTokens.get(i).getName().equals("no")) {
-                translatedTokens.add(0, translatedTokens.get(i));
-                translatedTokens.remove(i + 1);
-                if(translatedTokens.get(i+1).getType().equals("punctuation")) {
-                    translatedTokens.remove(i+1);
-                }
+                word neg, verb;
+                neg = translatedTokens.get(i);
+                verb = translatedTokens.get(i-1);
+
+                translatedTokens.set(i-1, neg);
+
+                translatedTokens.set(i, verb);
+               // if(translatedTokens.get(i+1).getType().equals("punctuation")) {
+                 //   translatedTokens.remove(i+1);
+               // }
             }
         }
+
+
+
     }
 
     private void rule10() {
         for (int i = 0; i < translatedTokens.size() - 1; i++) {
             if (translatedTokens.get(i).getName().equals("con") && translatedTokens.get(i + 1).getName().equals("tú")) {
-                translatedTokens.remove(i);
-                translatedTokens.remove(i); /* removed i originally so now i + 1 == i */
+                translatedTokens.get(i).setName("contigo");
+                translatedTokens.get(i).setType("pronoun");
+                translatedTokens.remove(i+1);
+                /* removed i originally so now i + 1 == i */
                 //if(translatedTokens.get(i).getType().equals("punctuation")) {
-                  //  translatedTokens.remove(i);
+                //  translatedTokens.remove(i);
                 //}
-                word x = new word();
-                x.setName("contigo");
-                x.setType("pronoun");
-                translatedTokens.add(x);
+
 
             } else if (translatedTokens.get(i).getType().equals("preposition") && translatedTokens.get(i + 1).getName().equals("tú")) {
                 translatedTokens.get(i + 1).setName("ti");
             }
             if (translatedTokens.get(i).getName().equals("con") && translatedTokens.get(i + 1).getName().equals("yo")) {
-                translatedTokens.remove(i);
-                translatedTokens.remove(i); /* removed i originally so now i + 1 == i */
+                translatedTokens.get(i).setName("conmigo");
+                translatedTokens.get(i).setType("pronoun");
+                translatedTokens.remove(i+1);
                 //if(translatedTokens.get(i).getType().equals("punctuation")) {
-                  //  translatedTokens.remove(i);
-               // }
-                word x = new word();
-                x.setName("conmigo");
-                x.setType("pronoun");
-                translatedTokens.add(x);
+                //  translatedTokens.remove(i);
+                // }
+
             }
         }
+
+
+
     }
 
 
@@ -449,14 +527,22 @@ public class translate {
 
         rule2And4();
         rule5();
+        rule7();
         rule9();
         rule6();
-        rule7();
+
         rule8();
         rule10();
     }
 
     public static void main(String[] args) throws IOException {
-        new translate();
+
+ //       BufferedReader fileReader = new BufferedReader(new FileReader(args[0]));
+
+//        for(String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
+  //          new translate(contents);
+    //    }
+
+       new translate("The time is difficult, the hours are hard but I am clear about my life\n");
     }
 }
