@@ -23,12 +23,11 @@ public class translate {
 
     private void readDict() throws IOException {
         BufferedReader fileRead = new BufferedReader(new InputStreamReader(new FileInputStream("dictionary.csv"), "UTF8"));
-        int counter = 0; /* initialises counter to 0 since counter is inspected later */
         String key = "";
         String value = "";
 
         for (String contents = fileRead.readLine(); contents != null; contents = fileRead.readLine()) { /* iterates through all rows in .csv file */
-
+            int counter = 0; /* initialises counter to 0 since counter is inspected later */
             for (String data : contents.split(",")) { /* iterates through all elements split around a comma (since .csv files seperate fields with commas */
 
                 if (counter == 0) {
@@ -46,7 +45,6 @@ public class translate {
                 }
 
             }
-            counter = 0;
         }
     }
 
