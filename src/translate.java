@@ -2,7 +2,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/* JAVA IS STUPID */
 public class translate {
     /* Array List of words to store each translated token */
     private ArrayList<word> translatedTokens = new ArrayList<>();
@@ -30,7 +29,6 @@ public class translate {
         for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
             new translate(contents);
         }
-        //new translate("The time is difficult, the hours are hard but I am clear about my life");
     }
 
     /**
@@ -116,12 +114,31 @@ public class translate {
      * Method that prints the contents of the translatedTokens array list to the console
      */
     private void printTokens() {
-        String punc = ".,:;!?..."; /* Contains punctuation to match to some string */
+
+        /**
+         * The following block of code correctly formats the code so
+         * it is printed to the console in a appropriate format. That is,
+         * if the token being currently inspected is of type of punctuation
+         * then there should not be white space following it, hence there is
+         * a condition that checks if the token after the current token is
+         * being inspected then the name of the current token should be printed
+         * without white space in front of it; otherwise print the name of the current
+         * token with white space after it. If the token to be printed is the
+         * first token in the array list of translated tokens then it should
+         * have its first character capitalised, regardless if the user
+         * initially capitalised it, and if the token has its field value
+         * isUCase equal to true, then it should be capitalised before
+         * printing it.
+         *
+         * Also, if the token to be printed is the last token in the list then
+         * it should not have white space following it; so there is a condition
+         * to ensure this is enforced.
+         */
 
         for (int i = 0; i < translatedTokens.size(); i++) { /* Iterates through all translated tokens */
             if (i == 0) {
                 translatedTokens.get(i).makeUCase();
-            } else if (i < translatedTokens.size() - 1 && punc.contains(translatedTokens.get(i + 1).getName())) {
+            } else if (i < translatedTokens.size() - 1 && translatedTokens.get(i + 1).getType().equals("punctuation")) {
                 System.out.print(translatedTokens.get(i).getName());
                 continue;
             } else if (translatedTokens.get(i).getIsUCase()) {
@@ -144,6 +161,34 @@ public class translate {
      * @throws IOException if the .csv file is not found
      */
     private void translate(String token) throws IOException { /* needs to throw such exceptions in order to read from given .csv file */
+
+        /**
+         * The following block of code actually translates each token to its
+         * corresponding Spanish word, if the token is valid. There are numerous
+         * if-else conditions, determining if the inputted token is valid,
+         * if it is a valid plural form of some word in the dictionary, if it
+         * starts with an upper-case character, if it starts with an upper-case
+         * character and is a valid plural form of some word in the dictionary, etc.
+         *
+         * Firstly, we have to consider if the token is simply some punctuation.
+         * To check this, we declare a String with a character sequence representing
+         * different kinds of punctuation, then check if this character sequences contains
+         * the inputted token; if so, a word object is declared, with the token representing
+         * the name and its grammar type as "punctuation". The function is then escaped.
+         *
+         * The following remaining else-if statements simply determine if the token is valid; the following
+         * list of conditions is how a valid token is determined.
+         * --------------------------------------------------------------------------------------
+         * A token is valid the dictionary contains it
+         * A token is valid if the dictionary contains a lower-case version of it
+         * A token is valid if it is a *valid* plural form of a word in the dictionary
+         * A token is valid if it is a *valid* upper-case, plural form of a word in the dictionary
+         * A token is valid if it has a Levenshtein distance of 1 with some word in the dictionary
+         * --------------------------------------------------------------------------------------
+         * If none of these conditions are met, then the token is not not valid; indicating that the user
+         * has inputted some garbage.
+         */
+
         String punc = ".,:;!?...";
 
         if (punc.contains(token)) {
@@ -164,6 +209,7 @@ public class translate {
             x.setType(dict.get(token.toLowerCase()).getType());
             x.isUCase(true);
             translatedTokens.add(x);
+            return;
         } else if (checkPlural(token)) {
             word x = new word();
             x.setName(getValue(token).getName());
@@ -172,6 +218,7 @@ public class translate {
                 x.setPlural(true);
                 translatedTokens.add(x);
             }
+            return;
         } else if (checkPlural(token.toLowerCase())) {
             word x = new word();
             x.setName(getValue(token.toLowerCase()).getName());
@@ -181,25 +228,25 @@ public class translate {
                 x.setPlural(true);
                 translatedTokens.add(x);
             }
+            return;
         }
-
-
     }
 
     /**
      * A method that checks with the given String data is the correct plural of the given String
      * dictWord
-     * @param data String representing the potential plural form of the String dictWord
+     * @param pluralKey String representing the potential plural form of the String dictWord
      * @return a boolean value indicating whether or not data is the plural form of dictWord
      */
-    private boolean checkPlural(String data) {
+    private boolean checkPlural(String pluralKey) {
 
         /**
-         * The following block of code consists of numerous if-else conditions in order to determine
-         * whether or not the inputted String data is the plural form of the inputted String dictWord.
-         * For the English languages, there are many rules in order to determine the plural form
-         * of a given word (and also many exceptions to these rules), however, we will only be considering
-         * the most "popular" plural forms of words; since the given dictionary only includes such words.
+         * The following block of code iterates through all keys in the dictionary, then it implements
+         * numerous if-else conditions in order to determine whether or not the inputted String potentialKey
+         * is the plural form of some key in the hash map. For the English languages, there are many rules in
+         * order to determine the plural form of a given word (and also many exceptions to these rules),
+         * however, we will only be considering the most "popular" plural forms of words; since the given
+         * dictionary only includes such words.
          *
          * To summarise, the rules for checking if a word is the plural form of another word (ignoring any exceptions)
          * are the following:
@@ -216,42 +263,56 @@ public class translate {
          * piano --> pianoes, however, none of the words that break these rules are includes in the given
          * dictionary so it is OK to simplify the pluralisation of the words.
          *
-         * So, if the dictWord string ends in any of the character sequences listed above, and the data String is simply
-         * the dictWord plus the corresponding plural form, then the data String is valid so the boolean value to be returned
+         * So, if the key string ends in any of the character sequences listed above, and the potentialKey String is simply
+         * the key plus the corresponding plural form, then the data potentialKey is valid so the boolean value to be returned
          * will be true; otherwise, if none of the if-else conditions are met, the boolean value to be returned will be false.
          */
 
         for (String key : dict.keySet()) {
-            if (data.equals(key + "es") && (key.endsWith("ch") || key.endsWith("x") || key.endsWith("s") || key.endsWith("z"))) {
+            if (pluralKey.equals(key + "es") && (key.endsWith("ch") || key.endsWith("x") || key.endsWith("s") || key.endsWith("z"))) {
                 return true;
-            } else if (data.equals(key + "s") && key.endsWith("y") && isVowel(key.substring(0, key.length() - 1))) {
+            } else if (pluralKey.equals(key + "s") && key.endsWith("y") && isVowel(key.substring(0, key.length() - 1))) {
                 return true;
-            } else if (key.endsWith("y") && data.equals(key.substring(0, key.length() - 1) + "ies") && !isVowel(key.substring(0, key.length() - 1))) {
+            } else if (key.endsWith("y") && pluralKey.equals(key.substring(0, key.length() - 1) + "ies") && !isVowel(key.substring(0, key.length() - 1))) {
                 return true;
-            } else if (data.equals(key + "es") && key.endsWith("o")) {
+            } else if (pluralKey.equals(key + "es") && key.endsWith("o")) {
                 return true;
-            } else if (data.equals(key + "s") && key.endsWith("o")) {
+            } else if (pluralKey.equals(key + "s") && key.endsWith("o")) {
                 return true;
-            } else if (data.equals(key + "s") && !key.endsWith("o") && !key.endsWith("y") && !key.endsWith("ch") && !key.endsWith("x") && !key.endsWith("s") && !key.endsWith("z")) {
+            } else if (pluralKey.equals(key + "s") && !key.endsWith("o") && !key.endsWith("y") && !key.endsWith("ch") && !key.endsWith("x") && !key.endsWith("s") && !key.endsWith("z")) {
                 return true;
             }
         }
         return false;
     }
 
-    private word getValue(String data) {
+    /**
+     * Method that returns the un-pluralised form of the given pluralised word
+     *
+     * @param pluralKey String object representing the pluralised form of the key to find
+     * @return
+     */
+    private word getValue(String pluralKey) {
+
+        /**
+         * The following block of code is similar to the checkPlural() method as it
+         * iterates through all keys in the dict hash map, however, rather than returning
+         * a boolean value indicating if the inputted String pluralKey is a valid pluralised
+         * form of a word in the hash map, it returns the word that the String pluralKey is
+         * the plural of.
+         */
         for (String key : dict.keySet()) {
-            if (data.equals(key + "es") && (key.endsWith("ch") || key.endsWith("x") || key.endsWith("s") || key.endsWith("z"))) {
+            if (pluralKey.equals(key + "es") && (key.endsWith("ch") || key.endsWith("x") || key.endsWith("s") || key.endsWith("z"))) {
                 return dict.get(key);
-            } else if (data.equals(key + "s") && key.endsWith("y") && isVowel(key.substring(0, key.length() - 1))) {
+            } else if (pluralKey.equals(key + "s") && key.endsWith("y") && isVowel(key.substring(0, key.length() - 1))) {
                 return dict.get(key);
-            } else if (key.endsWith("y") && data.equals(key.substring(0, key.length() - 1) + "ies") && !isVowel(key.substring(0, key.length() - 1))) {
+            } else if (key.endsWith("y") && pluralKey.equals(key.substring(0, key.length() - 1) + "ies") && !isVowel(key.substring(0, key.length() - 1))) {
                 return dict.get(key);
-            } else if (data.equals(key + "es") && key.endsWith("o")) {
+            } else if (pluralKey.equals(key + "es") && key.endsWith("o")) {
                 return dict.get(key);
-            } else if (data.equals(key + "s") && key.endsWith("o")) {
+            } else if (pluralKey.equals(key + "s") && key.endsWith("o")) {
                 return dict.get(key);
-            } else if (data.equals(key + "s") && !key.endsWith("o") && !key.endsWith("y") && !key.endsWith("ch") && !key.endsWith("x") && !key.endsWith("s") && !key.endsWith("z")) {
+            } else if (pluralKey.equals(key + "s") && !key.endsWith("o") && !key.endsWith("y") && !key.endsWith("ch") && !key.endsWith("x") && !key.endsWith("s") && !key.endsWith("z")) {
                 return dict.get(key);
             }
         }
@@ -326,12 +387,10 @@ public class translate {
     private int distance(String a, String b) {
         a = a.toLowerCase();
         b = b.toLowerCase();
-        // i == 0
         int[] costs = new int[b.length() + 1];
         for (int j = 0; j < costs.length; j++)
             costs[j] = j;
         for (int i = 1; i <= a.length(); i++) {
-            // j == 0; nw = lev(i - 1, j)
             costs[0] = i;
             int nw = i - 1;
             for (int j = 1; j <= b.length(); j++) {

@@ -100,12 +100,19 @@ class word {
         return this.punctuation;
     }
 
-    public void makePlural(String text, int position) {
-        if (isVowel(text)) {
-            this.name = text + "s";
+    public void makePlural(String wordName, int position) {
+
+        /**
+         * The following block of code checks if the inputted String
+         * wordName ends in a vowel or a consonant. If it ends in a
+         * vowel then the plural form of this word is simply the wordName
+         * + 's', otherwise; the plural form is the wordName + "es".
+         */
+        if (isVowel(wordName)) {
+            this.name = wordName + "s";
         } else {
-            text = text + "es";
-            this.name = text;
+            wordName = wordName + "es";
+            this.name = wordName;
         }
     }
 
@@ -115,6 +122,21 @@ class word {
      * @return boolean value indicating if the inputted String ends in a vowel
      */
     private boolean isVowel(String input) {
+
+        /**
+         * The following block of code checks if the inputted String strToCheck
+         * ends in a character that is a vowel, that is; the character is either
+         * a, e, i, o or u. Firstly, a String object consisting of such a character
+         * sequence must be declared; then one can simply check if this String object
+         * contains the last character of strToCheck. We then get the length of
+         * strToCheck and pass this to a declared int, i.e. input_size. We then
+         * return a statement that looks messy, however, when you inspect if further
+         * it makes more sense. We check if the String vowels contains the substring of
+         * strToCheck, starting from (input_size - 1) to (input_size), since this substring
+         * is simply the last character, and return this, since String.contains() is a boolean
+         * value.
+         */
+
         String vowels = "aeiou";
         int input_size = input.length();
         return vowels.contains(input.substring(input_size - 1, input_size));
