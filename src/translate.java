@@ -11,7 +11,7 @@ public class translate {
     private String stringToTranslate;
     /* String storing some regex to ensure that punctuation is considered as a token */
     private static final String TOKENIZE = " ?(?<!\\G)((?<=[^\\p{Punct}])(?=\\p{Punct})|\\b) ?";
-
+    /* String storing a character sequence representing all of the vowels in the alphabet */
     private static final String VOWELS = "aeiou";
 
     /**
