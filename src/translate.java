@@ -47,13 +47,12 @@ public class translate {
             }
         }
     }
-    
+
     private void getInput() throws IOException { /* needs to throw exceptions in order to call translate function */
 
         //System.out.println("ENGLISH TO SPANISH TRANSLATOR");
         //System.out.println("------------------------------");
         //System.out.println("Enter a sentence you would like to translate"); /* default output msg to user */
-
         readDict();
 
         // Scanner sc = new Scanner(System.in); /* scanner instance to get input */
