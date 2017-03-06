@@ -3,19 +3,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-
-/* this is a test */
-
 public class translate {
     private ArrayList<word> translatedTokens = new ArrayList<>(); /* array list that stores the value of the translated tokens */
     private boolean isPlural = false;
     private Map<String, word> dict = new HashMap<>();
     private String stringToTranslate;
 
-
     private translate(String stringToTranslate) throws IOException { /* constructor that calls the getInput function when called in order to get the msg to be translated */
         this.stringToTranslate = stringToTranslate;
         getInput();
+    }
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader fileReader = new BufferedReader(new FileReader(args[0]));
+        for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
+            new translate(contents);
+        }
     }
 
     private void readDict() throws IOException {
@@ -65,13 +68,7 @@ public class translate {
         }
 
         new rule(translatedTokens);
-
-
         printTokens();
-
-        System.out.print("\n");
-
-
     }
 
     private void printTokens() {
@@ -176,7 +173,6 @@ public class translate {
 
     }
 
-
     private boolean checkPlural(String dictWord, String data) {
 
         if (data.equals(dictWord + "es") && (dictWord.endsWith("ch") || dictWord.endsWith("x") || dictWord.endsWith("s") || dictWord.endsWith("z"))) {
@@ -206,13 +202,11 @@ public class translate {
     private boolean getLev(String tokenToTranslate, String readData) { //Change this, close to finishing
         int distance = distance(tokenToTranslate, readData);
         return !dict.containsKey(tokenToTranslate) && distance == 1;
-
     }
 
     private int distance(String a, String b) {
         a = a.toLowerCase();
         b = b.toLowerCase();
-
         // i == 0
         int[] costs = new int[b.length() + 1];
         for (int j = 0; j < costs.length; j++)
@@ -228,16 +222,5 @@ public class translate {
             }
         }
         return costs[b.length()];
-    }
-
-    public static void main(String[] args) throws IOException {
-
-        BufferedReader fileReader = new BufferedReader(new FileReader(args[0]));
-
-        for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
-            new translate(contents);
-        }
-
-
     }
 }

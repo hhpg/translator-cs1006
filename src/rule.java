@@ -9,7 +9,7 @@ class rule {
         grammarRules();
     }
 
-    private void rule0() {
+    private void checkTypeOfHer() {
         for (int i = 0; i < translatedTokens.size() - 1; i++) {
             if (translatedTokens.get(i).getName().equals("ella") && (translatedTokens.get(i + 1).getType().equals("noun") || translatedTokens.get(i + 1).getType().equals("adjective"))) {
                 translatedTokens.get(i).setName("su");
@@ -18,7 +18,7 @@ class rule {
         }
     }
 
-    private void rule1() {
+    private void setGenders() {
         String adj, noun;
 
         for (int i = 0; i < translatedTokens.size(); i++) {
@@ -71,7 +71,7 @@ class rule {
 
     }
 
-    private void rule3() {
+    private void swapNounAndAdj() {
 
         int article_pos = -1;
 
@@ -112,7 +112,7 @@ class rule {
         }
     }
 
-    private void rule2And4() {
+    private void ensurePlurality() {
 
         setPlurals();
         String noun, adj, article, possessive;
@@ -139,7 +139,7 @@ class rule {
             }
     }
 
-    private void rule5() {
+    private void replaceAre() {
         for (int i = 0; i < translatedTokens.size() - 1; i++) { /* rule 5 */
             if (translatedTokens.get(i).getName().equals("tú") && translatedTokens.get(i + 1).getName().equals("son")) {
                 translatedTokens.get(i + 1).setName("eres");
@@ -149,7 +149,7 @@ class rule {
         }
     }
 
-    private void rule6() {
+    private void changeToEst() {
         for (int i = 0; i < translatedTokens.size() - 1; i++) { /* rule 6 */
             if (translatedTokens.get(i).getName().equals("eres") && (translatedTokens.get(i + 1).getType().equals("verb") || translatedTokens.get(i + 1).getName().equals("con"))) {
                 translatedTokens.get(i).setName("estás");
@@ -165,7 +165,7 @@ class rule {
         }
     }
 
-    private void rule7() {
+    private void dropPronouns() {
         ArrayList<String> pronounList = new ArrayList<>();
         pronounList.add("es");
         pronounList.add("estoy");
@@ -198,7 +198,7 @@ class rule {
     }
 
 
-    private void rule8() {
+    private void pronounFollowedByVerb() {
         for (int i = 2; i < translatedTokens.size(); i++) {
    /* you are watching me */
             if (translatedTokens.get(i).getName().equals("yo") && translatedTokens.get(i - 1).getType().equals("verb")) {
@@ -219,7 +219,7 @@ class rule {
         }
     }
 
-    private void rule9() {
+    private void negation() {
         for (int i = 1; i < translatedTokens.size() - 1; i++) {
             if (translatedTokens.get(i).getName().equals("no")) {
                 word neg, verb;
@@ -234,7 +234,7 @@ class rule {
         }
     }
 
-    private void rule10() {
+    private void replacements() {
         for (int i = 0; i < translatedTokens.size() - 1; i++) {
             if (translatedTokens.get(i).getName().equals("con") && translatedTokens.get(i + 1).getName().equals("tú")) {
                 translatedTokens.get(i).setName("contigo");
@@ -259,15 +259,15 @@ class rule {
     }
 
     private void grammarRules() {
-        rule0();
-        rule3();
-        rule1();
-        rule2And4();
-        rule5();
-        rule7();
-        rule9();
-        rule6();
-        rule8();
-        rule10();
+        checkTypeOfHer();
+        swapNounAndAdj();
+        setGenders();
+        ensurePlurality();
+        replaceAre();
+        dropPronouns();
+        negation();
+        changeToEst();
+        pronounFollowedByVerb();
+        replacements();
     }
 }
