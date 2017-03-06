@@ -1,10 +1,8 @@
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/* JAVA IS STUPID */
 public class translate {
     /* Array List of words to store each translated token */
     private ArrayList<word> translatedTokens = new ArrayList<>();
@@ -21,16 +19,18 @@ public class translate {
      * @throws IOException if the .csv file is not found
      */
     private translate(String stringToTranslate) throws IOException { /* constructor that calls the getInput function when called in order to get the msg to be translated */
-        this.stringToTranslate = stringToTranslate;
-        getInput();
+        if (!stringToTranslate.isEmpty()) {
+            this.stringToTranslate = stringToTranslate;
+            getInput();
+        }
     }
 
     public static void main(String[] args) throws IOException {
-        // BufferedReader fileReader = new BufferedReader(new FileReader(args[0]));
-        //for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
-        //   new translate(contents);
-        // }
-        new translate("The time is difficult, the hours are hard but I am clear about my life");
+        BufferedReader fileReader = new BufferedReader(new FileReader(args[0]));
+        for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
+            new translate(contents);
+        }
+        //new translate("The time is difficult, the hours are hard but I am clear about my life");
     }
 
     /**
@@ -107,7 +107,9 @@ public class translate {
         }
 
         new rule(translatedTokens);
+
         printTokens();
+        System.out.print("\n");
     }
 
     /**
@@ -143,7 +145,6 @@ public class translate {
      */
     private void translate(String token) throws IOException { /* needs to throw such exceptions in order to read from given .csv file */
         String punc = ".,:;!?...";
-        String translatedWord = "";
 
         if (punc.contains(token)) {
             word x = new word();
@@ -151,77 +152,47 @@ public class translate {
             x.setType("punctuation");
             translatedTokens.add(x);
             return;
-        }
-
-        BufferedReader fileRead = new BufferedReader(new InputStreamReader(new FileInputStream("dictionary.csv"), "UTF8")); /* BufferReader instance used to read the required .csv file */
-         /* initialises counter to 0 since counter is inspected later */
-        for (String contents = fileRead.readLine(); contents != null; contents = fileRead.readLine()) { /* iterates through all rows in .csv file */
-            boolean isUpperCase = false;
-            boolean isPlural = false;
-            int counter = 0;
-            for (String data : contents.split(",")) { /* iterates through all elements split around a comma (since .csv files seperate fields with commas */
-                if (counter == 0 && token.equals(data)) {
-                    counter++;
-                } else if (counter == 0 && checkPlural(data, token) && !token.equals("is")) {
-                    isPlural = true;
-                    counter++;
-                } else if (counter == 0 && token.toLowerCase().equals(data)) {
-                    isUpperCase = true;
-                    counter++;
-                } else if (counter == 0 && checkPlural(data, token.toLowerCase()) && !token.equals("is")) {
-                    isUpperCase = true;
-                    isPlural = true;
-                    counter++;
-                } else if (counter == 0 && !token.equals(data) && !dict.containsKey(token) && !dict.containsKey(token.toLowerCase())
-                        && getLev(token, data)) {
-                    translatedWord = data;
-                    counter += 2;
-                    continue;
-                } else if (counter == 1) {
-                    translatedWord = data;
-                    counter++;
-                } else if (counter == 2) {
-                    if (!isUpperCase && isPlural) {
-                        word x = new word();
-                        x.setName(translatedWord);
-                        x.setType(data);
-                        x.setPlural(true);
-                        translatedTokens.add(x);
-                    } else if (!isUpperCase && !isPlural) {
-                        word x = new word();
-                        x.setName(translatedWord);
-                        x.setPlural(false);
-                        x.setType(data);
-                        translatedTokens.add(x);
-                    } else if (isUpperCase && isPlural) {
-                        word x = new word();
-                        x.setName(translatedWord);
-                        x.setType(data);
-                        x.setPlural(true);
-                        x.isUCase(true);
-                        translatedTokens.add(x);
-                    } else if (isUpperCase && !isPlural) {
-                        word x = new word();
-                        x.setName(translatedWord);
-                        x.setType(data);
-                        x.isUCase(true);
-                        x.setPlural(false);
-                        translatedTokens.add(x);
-                    }
-                    return;
-                }
+        } else if (dict.containsKey(token)) {
+            word x = new word();
+            x.setName(dict.get(token).getName());
+            x.setType(dict.get(token).getType());
+            translatedTokens.add(x);
+            return;
+        } else if (dict.containsKey(token.toLowerCase())) {
+            word x = new word();
+            x.setName(dict.get(token.toLowerCase()).getName());
+            x.setType(dict.get(token.toLowerCase()).getType());
+            x.isUCase(true);
+            translatedTokens.add(x);
+        } else if (checkPlural(token)) {
+            word x = new word();
+            x.setName(getValue(token).getName());
+            x.setType(getValue(token).getType());
+            if (x.getType().equals("noun")) {
+                x.setPlural(true);
+                translatedTokens.add(x);
+            }
+        } else if (checkPlural(token.toLowerCase())) {
+            word x = new word();
+            x.setName(getValue(token.toLowerCase()).getName());
+            x.setType(getValue(token.toLowerCase()).getType());
+            x.isUCase(true);
+            if (x.getType().equals("noun")) {
+                x.setPlural(true);
+                translatedTokens.add(x);
             }
         }
+
+
     }
 
     /**
      * A method that checks with the given String data is the correct plural of the given String
      * dictWord
-     * @param dictWord String representing the value of the word in the dictionary being inspected
      * @param data String representing the potential plural form of the String dictWord
      * @return a boolean value indicating whether or not data is the plural form of dictWord
      */
-    private boolean checkPlural(String dictWord, String data) {
+    private boolean checkPlural(String data) {
 
         /**
          * The following block of code consists of numerous if-else conditions in order to determine
@@ -250,21 +221,43 @@ public class translate {
          * will be true; otherwise, if none of the if-else conditions are met, the boolean value to be returned will be false.
          */
 
-        if (data.equals(dictWord + "es") && (dictWord.endsWith("ch") || dictWord.endsWith("x") || dictWord.endsWith("s") || dictWord.endsWith("z"))) {
-            return true;
-        } else if (data.equals(dictWord + "s") && dictWord.endsWith("y") && isVowel(dictWord.substring(0, dictWord.length() - 1))) {
-            return true;
-        } else if (dictWord.endsWith("y") && data.equals(dictWord.substring(0, dictWord.length() - 1) + "ies") && !isVowel(dictWord.substring(0, dictWord.length() - 1))) {
-            return true;
-        } else if (data.equals(dictWord + "es") && dictWord.endsWith("o")) {
-            return true;
-        } else if (data.equals(dictWord + "s") && dictWord.endsWith("o")) {
-            return true;
-        } else if (data.equals(dictWord + "s") && !dictWord.endsWith("o") && !dictWord.endsWith("y") && !dictWord.endsWith("ch") && !dictWord.endsWith("x") && !dictWord.endsWith("s") && !dictWord.endsWith("z")) {
-            return true;
+        for (String key : dict.keySet()) {
+            if (data.equals(key + "es") && (key.endsWith("ch") || key.endsWith("x") || key.endsWith("s") || key.endsWith("z"))) {
+                return true;
+            } else if (data.equals(key + "s") && key.endsWith("y") && isVowel(key.substring(0, key.length() - 1))) {
+                return true;
+            } else if (key.endsWith("y") && data.equals(key.substring(0, key.length() - 1) + "ies") && !isVowel(key.substring(0, key.length() - 1))) {
+                return true;
+            } else if (data.equals(key + "es") && key.endsWith("o")) {
+                return true;
+            } else if (data.equals(key + "s") && key.endsWith("o")) {
+                return true;
+            } else if (data.equals(key + "s") && !key.endsWith("o") && !key.endsWith("y") && !key.endsWith("ch") && !key.endsWith("x") && !key.endsWith("s") && !key.endsWith("z")) {
+                return true;
+            }
         }
         return false;
     }
+
+    private word getValue(String data) {
+        for (String key : dict.keySet()) {
+            if (data.equals(key + "es") && (key.endsWith("ch") || key.endsWith("x") || key.endsWith("s") || key.endsWith("z"))) {
+                return dict.get(key);
+            } else if (data.equals(key + "s") && key.endsWith("y") && isVowel(key.substring(0, key.length() - 1))) {
+                return dict.get(key);
+            } else if (key.endsWith("y") && data.equals(key.substring(0, key.length() - 1) + "ies") && !isVowel(key.substring(0, key.length() - 1))) {
+                return dict.get(key);
+            } else if (data.equals(key + "es") && key.endsWith("o")) {
+                return dict.get(key);
+            } else if (data.equals(key + "s") && key.endsWith("o")) {
+                return dict.get(key);
+            } else if (data.equals(key + "s") && !key.endsWith("o") && !key.endsWith("y") && !key.endsWith("ch") && !key.endsWith("x") && !key.endsWith("s") && !key.endsWith("z")) {
+                return dict.get(key);
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Method that determines if the given String ends with a vowel or a

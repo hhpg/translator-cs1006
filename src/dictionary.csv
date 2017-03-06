@@ -9,7 +9,6 @@ we,nosotros,pronoun
 it,eso,pronoun
 me,yo,pronoun
 him,él,pronoun
-her,ella,pronoun
 them,ellos,pronoun
 us,nosotros,pronoun
 those,esos,pronoun
@@ -17,6 +16,7 @@ your,tu,possessive
 my,mi,possessive
 his,su,possessive
 her,su,possessive
+her,ella,pronoun
 their,su,possessive
 and,y,conjunction
 or,o,conjunction

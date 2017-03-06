@@ -77,7 +77,7 @@ class rule {
 
             } else if (isMasc) { /* masculine */ /* rule 1 */
 
-                if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getName().endsWith("o") && (translatedTokens.get(i - 1).getType().equals("noun") ||
+                if (i > 1 && translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getName().endsWith("o") && (translatedTokens.get(i - 1).getType().equals("noun") ||
                         translatedTokens.get(i - 2).getType().equals("noun") || translatedTokens.get(i - 1).getName().equals("y"))) {
                     adj = translatedTokens.get(i).getName();
                     int size = adj.length();
@@ -125,15 +125,15 @@ class rule {
     private void setPlurals() {
 
         for (int i = 0; i < translatedTokens.size(); i++) {
-            if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i - 1).getType().equals("noun") && translatedTokens.get(i - 1).getIsPlural()) {
+            if (i > 0 && translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i - 1).getType().equals("noun") && translatedTokens.get(i - 1).getIsPlural()) {
                 translatedTokens.get(i).setPlural(true);
-            } else if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i - 2).getType().equals("noun") && translatedTokens.get(i - 2).getIsPlural()) {
+            } else if (i > 1 && translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i - 2).getType().equals("noun") && translatedTokens.get(i - 2).getIsPlural()) {
                 translatedTokens.get(i).setPlural(true);
-            } else if (translatedTokens.get(i).getType().equals("article") && isMasc && translatedTokens.get(i + 1).getType().equals("noun") && translatedTokens.get(i + 1).getIsPlural()) {
+            } else if (i < translatedTokens.size() - 1 && translatedTokens.get(i).getType().equals("article") && isMasc && translatedTokens.get(i + 1).getType().equals("noun") && translatedTokens.get(i + 1).getIsPlural()) {
                 translatedTokens.get(i).setPlural(true);
-            } else if (translatedTokens.get(i).getType().equals("article") && !isMasc && translatedTokens.get(i + 1).getType().equals("noun") && translatedTokens.get(i + 1).getIsPlural()) {
+            } else if (i < translatedTokens.size() - 1 && translatedTokens.get(i).getType().equals("article") && !isMasc && translatedTokens.get(i + 1).getType().equals("noun") && translatedTokens.get(i + 1).getIsPlural()) {
                 translatedTokens.get(i).setPlural(true);
-            } else if (translatedTokens.get(i).getType().equals("possessive") && translatedTokens.get(i + 1).getIsPlural()) {
+            } else if (i < translatedTokens.size() - 1 && translatedTokens.get(i).getType().equals("possessive") && translatedTokens.get(i + 1).getIsPlural()) {
                 translatedTokens.get(i).setPlural(true);
             }
         }
