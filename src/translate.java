@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class translate {
     /* Array List of words to store each translated token */
-    private ArrayList<word> translatedTokens = new ArrayList<>(); /* array list that stores the value of the translated tokens */
+    private ArrayList<word> translatedTokens = new ArrayList<>();
     /* Hash Map that maps an English word to the corresponding Spanish word */
     private HashMap<String, word> dict = new HashMap<>();
     /* String to store the English sentence that the user wishes to be translated */
@@ -30,7 +30,6 @@ public class translate {
         //for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
         //   new translate(contents);
         // }
-
         new translate("The time is difficult, the hours are hard but I am clear about my life");
     }
 
@@ -42,8 +41,28 @@ public class translate {
      */
     private void readDict() throws IOException {
         BufferedReader fileRead = new BufferedReader(new InputStreamReader(new FileInputStream("dictionary.csv"), "UTF8"));
-        String key = "";
-        String value = "";
+        String key = ""; /* String representing the key that will map the Spanish translation of a word to the Hash Map */
+        String espWord = ""; /* String representing the translated Spanish word */
+
+        /**
+         * The following block of code includes two iterations; the outer loop iterates through
+         * each line in the csv file, and the inner loop iterates through each word split
+         * by a comma in each line; since the standard delimiter in a csv file is a
+         * comma. To keep count of which word is being read, a counter is implemented;
+         * where the counter has 3 possible values; 0, 1 and 2. The value 0 indicates
+         * that the English word is being read, the value 1 indicates that the corresponding
+         * Spanish word is being read and the value 2 indicates that the grammar type of the
+         * word is being read.
+         *
+         * Hence, if the counter is 0, the current word being read is passed to the key String,
+         * if the counter is 1, the current word being read is passed to the espWord String
+         * and if the counter is 2, a new word object is created, calling the appropriate
+         * setters (i.e. setName and setType) in order to set the actual word name and the
+         * type of the word, then the dict Hash Map is used to map the key String to the
+         * word object; then the inner loop finishes iterating through each word in a line
+         * so the outer loop continues. The value of the counter is reset each time, since it
+         * is declared within the outer loop.
+         */
 
         for (String contents = fileRead.readLine(); contents != null; contents = fileRead.readLine()) { /* iterates through all rows in .csv file */
             int counter = 0; /* initialises counter to 0 since counter is inspected later */
@@ -52,14 +71,13 @@ public class translate {
                     key = data;
                     counter++;
                 } else if (counter == 1) {
-                    value = data;
+                    espWord = data;
                     counter++;
                 } else if (counter == 2) {
                     word x = new word();
-                    x.setName(value);
+                    x.setName(espWord);
                     x.setType(data);
                     dict.put(key, x);
-                    break;
                 }
             }
         }
@@ -205,6 +223,33 @@ public class translate {
      */
     private boolean checkPlural(String dictWord, String data) {
 
+        /**
+         * The following block of code consists of numerous if-else conditions in order to determine
+         * whether or not the inputted String data is the plural form of the inputted String dictWord.
+         * For the English languages, there are many rules in order to determine the plural form
+         * of a given word (and also many exceptions to these rules), however, we will only be considering
+         * the most "popular" plural forms of words; since the given dictionary only includes such words.
+         *
+         * To summarise, the rules for checking if a word is the plural form of another word (ignoring any exceptions)
+         * are the following:
+         *
+         * ------------------------------------------------------------------------------------------------------------
+         * If a noun ends in -ch, -x, -s, -z or s- like sounds then the plural form of such a noun is -es.
+         * If a noun ends in a vowel + y, the plural form of such a noun is -s.
+         * If a noun ends in a consonant + y, the plural form of such a noun is -ies.
+         * If a noun ends in -o, the plural form of such a noun is -es.
+         * Otherwise, if a noun does not end in the above listed sequence of characters, then the plural form is -s.
+         * ------------------------------------------------------------------------------------------------------------
+         *
+         * Note that we have ignored exceptions to the rules listed above (i.e. piano --> pianos as opposed to
+         * piano --> pianoes, however, none of the words that break these rules are includes in the given
+         * dictionary so it is OK to simplify the pluralisation of the words.
+         *
+         * So, if the dictWord string ends in any of the character sequences listed above, and the data String is simply
+         * the dictWord plus the corresponding plural form, then the data String is valid so the boolean value to be returned
+         * will be true; otherwise, if none of the if-else conditions are met, the boolean value to be returned will be false.
+         */
+
         if (data.equals(dictWord + "es") && (dictWord.endsWith("ch") || dictWord.endsWith("x") || dictWord.endsWith("s") || dictWord.endsWith("z"))) {
             return true;
         } else if (data.equals(dictWord + "s") && dictWord.endsWith("y") && isVowel(dictWord.substring(0, dictWord.length() - 1))) {
@@ -224,13 +269,27 @@ public class translate {
     /**
      * Method that determines if the given String ends with a vowel or a
      * consonant
-     * @param input some String to be checked if it ends in a vowel or not
+     * @param strToCheck some String to be checked if it ends in a vowel or not
      * @return a boolean value indicating if the given String ends in a vowel
      */
-    private boolean isVowel(String input) {
+    private boolean isVowel(String strToCheck) {
+        /**
+         * The following block of code checks if the inputted String strToCheck
+         * ends in a character that is a vowel, that is; the character is either
+         * a, e, i, o or u. Firstly, a String object consisting of such a character
+         * sequence must be declared; then one can simply check if this String object
+         * contains the last character of strToCheck. We then get the length of
+         * strToCheck and pass this to a declared int, i.e. input_size. We then
+         * return a statement that looks messy, however, when you inspect if further
+         * it makes more sense. We check if the String vowels contains the substring of
+         * strToCheck, starting from (input_size - 1) to (input_size), since this substring
+         * is simply the last character, and return this, since String.contains() is a boolean
+         * value.
+         */
+
         String vowels = "aeiou";
-        int input_size = input.length();
-        return vowels.contains(input.substring(input_size - 1, input_size));
+        int input_size = strToCheck.length();
+        return vowels.contains(strToCheck.substring(input_size - 1, input_size));
     }
 
     /**
@@ -244,6 +303,22 @@ public class translate {
      * it only takes 1 change to tokenToTranslate to "change" it to readData
      */
     private boolean getLev(String tokenToTranslate, String readData) {
+
+        /**
+         * The following block of code gets the Levenshtein distance
+         * between the two Strings tokenToTranslate and readData,
+         * that is; an integer value representing the number of changes
+         * or edits one has to make to tokenToTranslate in order for its
+         * value to be equivalent to readData, then a boolean value is
+         * returned, which has a value of true if the dictionary does not
+         * contain a key with a value equivalent to the String tokenToTranslate
+         * AND if the value returned by the distance() method is equal to 1;
+         * otherwise a value of false is returned. We check if the dictionary
+         * does not contain a key with the same value as tokenToTranslate
+         * to ensure that a valid word isn't considered as a misspelled one
+         * and incorrectly corrected into some other word.
+         */
+
         int distance = distance(tokenToTranslate, readData);
         return !dict.containsKey(tokenToTranslate) && distance == 1;
     }
