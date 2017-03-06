@@ -9,6 +9,10 @@ public class translate {
     private HashMap<String, word> dict = new HashMap<>();
     /* String to store the English sentence that the user wishes to be translated */
     private String stringToTranslate;
+    /* String storing some regex to ensure that punctuation is considered as a token */
+    private static final String TOKENIZE = " ?(?<!\\G)((?<=[^\\p{Punct}])(?=\\p{Punct})|\\b) ?";
+
+    private static final String VOWELS = "aeiou";
 
     /**
      * Constructor that gets some English sentence from the user and passes this sentence to the stringToTranslate field,
@@ -17,7 +21,12 @@ public class translate {
      * @param stringToTranslate stores the English representation of the sentence to translate
      * @throws IOException if the .csv file is not found
      */
-    private translate(String stringToTranslate) throws IOException { /* constructor that calls the getInput function when called in order to get the msg to be translated */
+    private translate(String stringToTranslate) throws IOException {
+        /**
+         * If the inputted String stringToTranslate isn't empty then
+         * the field stringToTranslate is set to stringToTranslate
+         * and the getInput() function is called.
+         */
         if (!stringToTranslate.isEmpty()) {
             this.stringToTranslate = stringToTranslate;
             getInput();
@@ -29,6 +38,14 @@ public class translate {
         for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
             new translate(contents);
         }
+
+        //System.out.println("ENGLISH TO SPANISH TRANSLATOR");
+        //System.out.println("------------------------------");
+        //System.out.println("Enter a sentence you would like to translate"); /* default output msg to user */
+
+        // Scanner sc = new Scanner(System.in); /* scanner instance to get input */
+        //String input = sc.nextLine(); /* gets user input */
+
     }
 
     /**
@@ -90,23 +107,15 @@ public class translate {
      */
     private void getInput() throws IOException { /* needs to throw exceptions in order to call translate function */
 
-        //System.out.println("ENGLISH TO SPANISH TRANSLATOR");
-        //System.out.println("------------------------------");
-        //System.out.println("Enter a sentence you would like to translate"); /* default output msg to user */
-        readDict();
+        readDict(); /* reads the csv file to the dict hash map */
+        String[] tokens = stringToTranslate.split(TOKENIZE);  /* splits each word by the TOKENIZE string */
 
-        // Scanner sc = new Scanner(System.in); /* scanner instance to get input */
-        //String input = sc.nextLine(); /* gets user input */
-
-        String[] tokens = stringToTranslate.split(" ?(?<!\\G)((?<=[^\\p{Punct}])(?=\\p{Punct})|\\b) ?"); /* regex to ensure that punctuation is considered as a token */
-
-        for (String token : tokens) { /* iterates through all elements in tokens array and calls the translate function to translate the elements to Spanish if possible */
-            translate(token);
+        for (String token : tokens) { /* iterates through all elements in tokens array and calls the translate */
+            translate(token);          /* function to translate the elements to Spanish if possible */
         }
 
-        new rule(translatedTokens);
-
-        printTokens();
+        new rule(translatedTokens); /* new rule object in order to enforce all grammar rules on translatedTokens */
+        printTokens(); /* prints the tokens to the console */
         System.out.print("\n");
     }
 
@@ -158,9 +167,8 @@ public class translate {
      * Method that determines if the given String token should be translated, and if so; translates it
      *
      * @param token a token of the tokenised sentence of the user's inputted sentence
-     * @throws IOException if the .csv file is not found
      */
-    private void translate(String token) throws IOException { /* needs to throw such exceptions in order to read from given .csv file */
+    private void translate(String token) {
 
         /**
          * The following block of code actually translates each token to its
@@ -229,7 +237,24 @@ public class translate {
                 translatedTokens.add(x);
             }
             return;
+        } else if (!getLev(token).isEmpty()) {
+            String key = getLev(token);
+            word x = new word();
+            x.setName(dict.get(key).getName());
+            x.setType(dict.get(key).getType());
+            translatedTokens.add(x);
+            return;
+        } else if (!getLev(token.toLowerCase()).isEmpty()) {
+            String key = getLev(token.toLowerCase());
+            word x = new word();
+            x.setName(dict.get(key).getName());
+            x.setType(dict.get(key).getType());
+            x.isUCase(true);
+            translatedTokens.add(x);
+            return;
         }
+
+
     }
 
     /**
@@ -335,46 +360,46 @@ public class translate {
          * contains the last character of strToCheck. We then get the length of
          * strToCheck and pass this to a declared int, i.e. input_size. We then
          * return a statement that looks messy, however, when you inspect if further
-         * it makes more sense. We check if the String vowels contains the substring of
+         * it makes more sense. We check if the String VOWELS contains the substring of
          * strToCheck, starting from (input_size - 1) to (input_size), since this substring
          * is simply the last character, and return this, since String.contains() is a boolean
          * value.
          */
 
-        String vowels = "aeiou";
         int input_size = strToCheck.length();
-        return vowels.contains(strToCheck.substring(input_size - 1, input_size));
+        return VOWELS.contains(strToCheck.substring(input_size - 1, input_size));
     }
 
     /**
-     * Method that determines if the given String tokenToTranslate should be corrected to the
-     * other given String readData
+     * Method that determines if the given String tokenToTranslate should be corrected  to some
+     * key in the dict hash map
      *
      * @param tokenToTranslate String representing the token that has to be translated
-     * @param readData         String representing the word that the String may be corrected to
-     * @return a boolean value indicating if the string that is "misspelled" is already in the
-     * dictionary and if Levenshtein distance between the two given strings is equal to 1; that is,
-     * it only takes 1 change to tokenToTranslate to "change" it to readData
+     * @return a String value representing the key that has a Levenshtein distance
+     * with tokenToTranslate equal to 1; if such a key doesn't exist the method
+     * returns an empty string
      */
-    private boolean getLev(String tokenToTranslate, String readData) {
+    private String getLev(String tokenToTranslate) {
 
         /**
-         * The following block of code gets the Levenshtein distance
-         * between the two Strings tokenToTranslate and readData,
-         * that is; an integer value representing the number of changes
-         * or edits one has to make to tokenToTranslate in order for its
-         * value to be equivalent to readData, then a boolean value is
-         * returned, which has a value of true if the dictionary does not
-         * contain a key with a value equivalent to the String tokenToTranslate
-         * AND if the value returned by the distance() method is equal to 1;
-         * otherwise a value of false is returned. We check if the dictionary
-         * does not contain a key with the same value as tokenToTranslate
-         * to ensure that a valid word isn't considered as a misspelled one
-         * and incorrectly corrected into some other word.
+         * The following block of code iterates through each key in the
+         * dictionary hash map, gets the Levenshtein ditance between
+         * tokenToTranslate and each key; that is, an integer value
+         * representing the number of changes or edits one has to make
+         * to tokenToTranslate in order for its value to be equivalent
+         * to the value of the key. If the dictionary does not already
+         * contain a key equivalent to tokenToTranslate AND the Levenshtein
+         * distance returned by the distance() method is equal to 1,
+         * then the method returns a boolean value of true,
+         * otherwise; it returns a boolean value of false.
          */
-
-        int distance = distance(tokenToTranslate, readData);
-        return !dict.containsKey(tokenToTranslate) && distance == 1;
+        for (String key : dict.keySet()) {
+            int distance = distance(tokenToTranslate, key);
+            if (!dict.containsKey(tokenToTranslate) && distance == 1) {
+                return key;
+            }
+        }
+        return "";
     }
 
     /**
@@ -385,6 +410,10 @@ public class translate {
      * remove a character, inserting a character, etc.)
      */
     private int distance(String a, String b) {
+        /**
+         * The following block of code determines the number of edits it
+         * would talk to turn a --> b. This is a well known algorithm.
+         */
         a = a.toLowerCase();
         b = b.toLowerCase();
         int[] costs = new int[b.length() + 1];
