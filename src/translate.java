@@ -20,7 +20,7 @@ public class translate {
             new translate(contents);
         }
     }
-
+    
     private void readDict() throws IOException {
         BufferedReader fileRead = new BufferedReader(new InputStreamReader(new FileInputStream("dictionary.csv"), "UTF8"));
         String key = "";
