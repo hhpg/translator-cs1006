@@ -1,14 +1,31 @@
 import java.util.ArrayList;
 
 class rule {
+    /**
+     * Array list that stores each translated token
+     */
     private ArrayList<word> translatedTokens = new ArrayList<>();
+    /**
+     * boolean value that indicates whether the noun is masculine or not
+     */
     private boolean isMasc = true;
 
-    rule(ArrayList<word> translatedTokens) {
-        this.translatedTokens = translatedTokens;
+    /**
+     * Constructor that sets the Array List translatedTokens field to the given Array List and calls the grammarRules() method
+     * to enforce all grammar rules
+     *
+     * @param tokens Array List of the tokens to translate
+     */
+    rule(ArrayList<word> tokens) {
+        this.translatedTokens = tokens;
         grammarRules();
     }
 
+    /**
+     * Method that checks what the grammar type of the English word "her" is, i.e. it can be a pronoun or a possessive, by checking the type of the
+     * word that is in front of it; if the word in front of it is a noun or an adjective then the word type will be possessive rather than a pronoun
+     * and the translated name of the word will be "su" as opposed to "ella", so this method enforces this grammar rule; let this rule be called rule 0
+     */
     private void checkTypeOfHer() {
         for (int i = 0; i < translatedTokens.size() - 1; i++) {
             if (translatedTokens.get(i).getName().equals("ella") && (translatedTokens.get(i + 1).getType().equals("noun") || translatedTokens.get(i + 1).getType().equals("adjective"))) {
@@ -18,6 +35,10 @@ class rule {
         }
     }
 
+    /**
+     * Method that enforces grammar rule 1, that is; ensuring that the article and adjective(if ending in 'o')
+     * agrees with the noun in gender
+     */
     private void setGenders() {
         String adj, noun;
 
@@ -71,6 +92,9 @@ class rule {
 
     }
 
+    /**
+     * Method that enforces grammar rule 3, that is; the adjectives should always be followed by the noun
+     */
     private void swapNounAndAdj() {
 
         int article_pos = -1;
@@ -95,6 +119,9 @@ class rule {
         }
     }
 
+    /**
+     * Method that sets the isPlural field of the word objects to true if the nouns are plural
+     */
     private void setPlurals() {
 
         for (int i = 0; i < translatedTokens.size(); i++) {
@@ -112,6 +139,11 @@ class rule {
         }
     }
 
+    /**
+     * Method that calls the setPlurals() methods to set the isPlural fields of each word object, then
+     * decides what to do based on the value of the isPlural field (i.e. if the isPlural field has a value of true
+     * then make the word being inspected plural if it an adjective or article) (rule 4)
+     */
     private void ensurePlurality() {
 
         setPlurals();
@@ -119,9 +151,6 @@ class rule {
         /* Rule 2 and 4 */
         for (int i = 0; i < translatedTokens.size(); i++)
             if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getIsPlural()) {
-                adj = translatedTokens.get(i).getName();
-                translatedTokens.get(i).makePlural(adj, i);
-            } else if (translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getIsPlural()) {
                 adj = translatedTokens.get(i).getName();
                 translatedTokens.get(i).makePlural(adj, i);
             } else if (translatedTokens.get(i).getType().equals("article") && isMasc && translatedTokens.get(i).getIsPlural()) {
@@ -139,6 +168,9 @@ class rule {
             }
     }
 
+    /**
+     * Spanish differentiates "are" based on the person, so this method determines what "are" should be replaced with (rule 5)
+     */
     private void replaceAre() {
         for (int i = 0; i < translatedTokens.size() - 1; i++) { /* rule 5 */
             if (translatedTokens.get(i).getName().equals("tú") && translatedTokens.get(i + 1).getName().equals("son")) {
@@ -149,6 +181,10 @@ class rule {
         }
     }
 
+    /**
+     * soy/eres/somos/es/son becomes “est**” based on the noun/pronoun when followed by a
+     * verb or “with”, hence this method ensures that this rule is enforced (rule 6)
+     */
     private void changeToEst() {
         for (int i = 0; i < translatedTokens.size() - 1; i++) { /* rule 6 */
             if (translatedTokens.get(i).getName().equals("eres") && (translatedTokens.get(i + 1).getType().equals("verb") || translatedTokens.get(i + 1).getName().equals("con"))) {
@@ -165,6 +201,9 @@ class rule {
         }
     }
 
+    /**
+     * Spanish usually drops pronouns with es/est*** forms, hence this method enforces this rule (rule 7)
+     */
     private void dropPronouns() {
         ArrayList<String> pronounList = new ArrayList<>();
         pronounList.add("es");
@@ -188,27 +227,36 @@ class rule {
         }
     }
 
-    private void swapTokens(String word, String type, int position) {
+    /**
+     * Method that swaps a token with the token that is in front of it (in front of being the position of the token + 1)
+     *
+     * @param name     the name of token that needs to be swapped
+     * @param type     the type of the token that needs to be swapped
+     * @param position the position of the token within the translatedTokens array list
+     */
+    private void swapTokens(String name, String type, int position) {
         translatedTokens.get(position).setName(translatedTokens.get(position - 1).getName());
         translatedTokens.get(position).setType(translatedTokens.get(position - 1).getType());
         translatedTokens.get(position - 1).setName(translatedTokens.get(position - 2).getName());
         translatedTokens.get(position - 1).setType(translatedTokens.get(position - 2).getType());
-        translatedTokens.get(position - 2).setName(word);
+        translatedTokens.get(position - 2).setName(name);
         translatedTokens.get(position - 2).setType(type);
     }
 
-
+    /**
+     * Method that checks if some pronoun is followed by some verb, and if so, enforces rule 8
+     */
     private void pronounFollowedByVerb() {
         for (int i = 2; i < translatedTokens.size(); i++) {
-   /* you are watching me */
+            /* you are watching me */
             if (translatedTokens.get(i).getName().equals("yo") && translatedTokens.get(i - 1).getType().equals("verb")) {
                 swapTokens("me", "pronoun", i);
             }
-   /* they are watching you */
+            /* they are watching you */
             else if (translatedTokens.get(i).getName().equals("tú") && translatedTokens.get(i - 1).getType().equals("verb")) {
                 swapTokens("te", "pronoun", i);
             }
-   /* i am watching him */
+            /* i am watching him */
             else if (translatedTokens.get(i).getName().equals("él") && translatedTokens.get(i - 1).getType().equals("verb")) {
                 swapTokens("lo", "pronoun", i);
             } else if (translatedTokens.get(i).getName().equals("ella") && translatedTokens.get(i - 1).getType().equals("verb")) {
@@ -219,6 +267,9 @@ class rule {
         }
     }
 
+    /**
+     * Method that checks if the sentence contains some negation, and if so, enforces rule 9
+     */
     private void negation() {
         for (int i = 1; i < translatedTokens.size() - 1; i++) {
             if (translatedTokens.get(i).getName().equals("no")) {
@@ -234,6 +285,10 @@ class rule {
         }
     }
 
+    /**
+     * In Spanish, some replacements are usaully done, i.e. with me --> con mi --> conmigo, with you --> con tú --> contigo,
+     * so this method ensures this rule is followed (rule 10).
+     */
     private void replacements() {
         for (int i = 0; i < translatedTokens.size() - 1; i++) {
             if (translatedTokens.get(i).getName().equals("con") && translatedTokens.get(i + 1).getName().equals("tú")) {
@@ -258,6 +313,10 @@ class rule {
         }
     }
 
+    /**
+     * Method that calls all of the above grammar rule methods to enforce all
+     * rules onto the translatedTokens Array List
+     */
     private void grammarRules() {
         checkTypeOfHer();
         swapNounAndAdj();

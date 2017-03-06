@@ -1,26 +1,52 @@
 /* Class that represents a translated word */
 class word {
-    private String name; /* stores the value of the translated word */
-    private String type; /* stores the type of the translated word; i.e. punctuation, adjective, noun, etc. */
-    private boolean isPlural = false; /* stores a boolean value indicating whether or not the translated word is plural or singular */
+    /**
+     * Stores the value of the  word
+     */
+    private String name;
+    /**
+     * Stores the grammar type of the word; i.e. puncuation, adjective, noun, etc.
+     */
+    private String type;
+    /**
+     * Stores a boolean value indicating whether or not the translated word is plural or singular
+     */
+    private boolean isPlural = false;
     private String punctuation;
-    private boolean isUCase = false; /* stores a boolean value indicating whether ot not the translated word should be capitalised or not */
+    /**
+     * Stores a boolean value indicating whether ot not the translated word should be capitalised or not
+     */
+    private boolean isUCase = false;
 
+    /**
+     * Method that sets the boolean field isPlural to the given boolean value
+     *
+     * @param isPlural boolean value indicating if the word is plural or not
+     */
     public void setPlural(boolean isPlural) {
         this.isPlural = isPlural;
     }
 
+    /**
+     * Method that returns the boolean field isPlural
+     *
+     * @return boolean value indicating if the word is plural or not
+     */
     public boolean getIsPlural() {
         return this.isPlural;
     }
-    /*
-     * Sets the name of the translated word
+
+    /**
+     * Method that sets the String field name to the given String object name
+     * @param name String object representing the name of the word
      */
     public void setName(String name) {
         this.name = name;
     }
-    /*
-     * Sets the type of the translated word
+
+    /**
+     * Method that sets the String field type to the given String object type
+     * @param type String object representing the grammar type of the word
      */
     public void setType(String type) {
         this.type = type;
@@ -29,30 +55,42 @@ class word {
     public void setPunctuation(String punctuation) {
         this.punctuation = punctuation;
     } /* TBC */
-    /*
-     * Gets the name of the translated word
+
+    /**
+     * Method that returns the name of the word
+     * @return a String object representing the name of the word
      */
     public String getName() {
         return this.name;
     }
-    /*
-     * Gets the type of the translated word
+
+    /**
+     * Method that returns the type of the word
+     * @return a String object representing the type of the word
      */
     public String getType() {
         return this.type;
     }
-    /*
-     * Sets the isUCase value to the inputted value
+
+    /**
+     * Method that sets the isUCase boolean field to the given boolean value x
+     * @param x boolean value indicating if the word starts with an upper-case character
      */
     public void isUCase(boolean x) {
         this.isUCase = x;
 
     }
+
+    /**
+     * Method that makes the first character of the word upper-case
+     */
     public void makeUCase() {
         this.name = name.substring(0, 1).toUpperCase() + name.substring(1);
     }
-    /*
-     * Gets the value indicating whether or not the translated word's name should be capitalised
+
+    /**
+     * Method that returns the boolean value isUCase
+     * @return boolean value indicating if the word starts with an upper-case character
      */
     public boolean getIsUCase() {
         return this.isUCase;
@@ -70,9 +108,11 @@ class word {
             this.name = text;
         }
     }
-    /*
-     * Function used to determine if the name of the translated word
-     * ends in a vowel or not
+
+    /**
+     * Method that checks if the inputted String ends in a vowel
+     * @param input String object that needs to be checked if it ends in a vowel
+     * @return boolean value indicating if the inputted String ends in a vowel
      */
     private boolean isVowel(String input) {
         String vowels = "aeiou";
