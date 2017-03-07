@@ -1,10 +1,6 @@
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class translate {
     /* Array List of words to store each translated token */
@@ -41,18 +37,18 @@ public class translate {
         /**
          * Keep the stuff below for testing
          */
-        // BufferedReader fileReader = new BufferedReader(new FileReader(args[0]));
-        //for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
-        //   new translate(contents);
-        //}
+        BufferedReader fileReader = new BufferedReader(new FileReader(args[0]));
+        for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
+            new translate(contents);
+        }
 
-        System.out.println("ENGLISH TO SPANISH TRANSLATOR");
-        System.out.println("------------------------------");
-        System.out.println("Enter a sentence you would like to translate"); /* default output msg to user */
+        //System.out.println("ENGLISH TO SPANISH TRANSLATOR");
+        //System.out.println("------------------------------");
+        //System.out.println("Enter a sentence you would like to translate"); /* Default output msg to user */
 
-        Scanner sc = new Scanner(System.in); /* scanner instance to get input */
-        String input = sc.nextLine(); /* gets user input */
-        new translate(input);
+        //Scanner sc = new Scanner(System.in); /* Scanner instance to get input */
+        //String input = sc.nextLine(); /* Gets user input */
+        //new translate(input);
     }
 
     /**
