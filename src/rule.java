@@ -11,8 +11,8 @@ class rule {
     private boolean isMasc = true;
 
     /**
-     * Constructor that sets the Array List translatedTokens field to the given Array List and calls the grammarRules() method
-     * to enforce all grammar rules
+     * Constructor that sets the Array List translatedTokens field to the given Array List and calls the grammarRules()
+     * methodto enforce all grammar rules
      *
      * @param tokens Array List of the tokens to translate
      */
@@ -22,13 +22,15 @@ class rule {
     }
 
     /**
-     * Method that checks what the grammar type of the English word "her" is, i.e. it can be a pronoun or a possessive, by checking the type of the
-     * word that is in front of it; if the word in front of it is a noun or an adjective then the word type will be possessive rather than a pronoun
-     * and the translated name of the word will be "su" as opposed to "ella", so this method enforces this grammar rule; let this rule be called rule 0
+     * Method that checks what the grammar type of the English word "her" is, i.e. it can be a pronoun or a possessive,
+     * by checking the type of the word that is in front of it; if the word in front of it is a noun or an adjective then
+     * the word type will be possessive rather than a pronoun and the translated name of the word will be "su" as
+     * opposed to "ella", so this method enforces this grammar rule; let this rule be called rule 0.
      */
     private void checkTypeOfHer() {
         for (int i = 0; i < translatedTokens.size() - 1; i++) {
-            if (translatedTokens.get(i).getName().equals("ella") && (translatedTokens.get(i + 1).getType().equals("noun") || translatedTokens.get(i + 1).getType().equals("adjective"))) {
+            if (translatedTokens.get(i).getName().equals("ella") && (translatedTokens.get(i + 1).getType().equals("noun") ||
+                    translatedTokens.get(i + 1).getType().equals("adjective"))) {
                 translatedTokens.get(i).setName("su");
                 translatedTokens.get(i).setType("possessive");
             }
@@ -47,21 +49,18 @@ class rule {
                 noun = translatedTokens.get(i).getName();
                 if (noun.endsWith("a") || noun.endsWith("d") || noun.endsWith("z") || noun.endsWith("ión")) {
                     isMasc = false;
-                    if (i > 0) {
-                        if (translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().toLowerCase().equals("el")) {
-                            translatedTokens.get(i - 1).setName("la");
-                        } else if (translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().substring(0, 2).equals("un")) {
-                            translatedTokens.get(i - 1).setName("una");
-                        }
+                    if (i > 0 && translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().toLowerCase().equals("el")) {
+                        translatedTokens.get(i - 1).setName("la");
+                    } else if (i > 0 && translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().substring(0, 2).equals("un")) {
+                        translatedTokens.get(i - 1).setName("una");
+
                     }
                 } else {
                     isMasc = true;
-                    if (i > 0) {
-                        if (translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().toLowerCase().equals("la")) {
-                            translatedTokens.get(i - 1).setName("el");
-                        } else if (translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().substring(0, 1).equals("una")) {
-                            translatedTokens.get(i - 1).setName("un");
-                        }
+                    if (i > 0 && translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().toLowerCase().equals("la")) {
+                        translatedTokens.get(i - 1).setName("el");
+                    } else if (i > 0 && translatedTokens.get(i - 1).getType().equals("article") && translatedTokens.get(i - 1).getName().substring(0, 1).equals("una")) {
+                        translatedTokens.get(i - 1).setName("un");
                     }
                 }
             }
@@ -74,9 +73,7 @@ class rule {
                     adj = adj.substring(0, size - 1) + "a";
                     translatedTokens.get(i).setName(adj);
                 }
-
             } else if (isMasc) { /* masculine */ /* rule 1 */
-
                 if (i > 1 && translatedTokens.get(i).getType().equals("adjective") && translatedTokens.get(i).getName().endsWith("o") && (translatedTokens.get(i - 1).getType().equals("noun") ||
                         translatedTokens.get(i - 2).getType().equals("noun") || translatedTokens.get(i - 1).getName().equals("y"))) {
                     adj = translatedTokens.get(i).getName();
@@ -85,11 +82,8 @@ class rule {
                     translatedTokens.get(i).setName(adj);
 
                 }
-
             }
-
         }
-
     }
 
     /**

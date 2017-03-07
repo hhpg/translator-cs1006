@@ -1,6 +1,10 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class translate {
     /* Array List of words to store each translated token */
@@ -34,17 +38,21 @@ public class translate {
     }
 
     public static void main(String[] args) throws IOException {
-        BufferedReader fileReader = new BufferedReader(new FileReader(args[0]));
-        for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
-            new translate(contents);
-        }
+        /**
+         * Keep the stuff below for testing
+         */
+        // BufferedReader fileReader = new BufferedReader(new FileReader(args[0]));
+        //for (String contents = fileReader.readLine(); contents != null; contents = fileReader.readLine()) {
+        //   new translate(contents);
+        //}
 
-        //System.out.println("ENGLISH TO SPANISH TRANSLATOR");
-        //System.out.println("------------------------------");
-        //System.out.println("Enter a sentence you would like to translate"); /* default output msg to user */
+        System.out.println("ENGLISH TO SPANISH TRANSLATOR");
+        System.out.println("------------------------------");
+        System.out.println("Enter a sentence you would like to translate"); /* default output msg to user */
 
-        // Scanner sc = new Scanner(System.in); /* scanner instance to get input */
-        //String input = sc.nextLine(); /* gets user input */
+        Scanner sc = new Scanner(System.in); /* scanner instance to get input */
+        String input = sc.nextLine(); /* gets user input */
+        new translate(input);
 
     }
 
@@ -105,18 +113,18 @@ public class translate {
      *
      * @throws IOException if the .csv file is not found
      */
-    private void getInput() throws IOException { /* needs to throw exceptions in order to call translate function */
+    private void getInput() throws IOException {
 
-        readDict(); /* reads the csv file to the dict hash map */
-        String[] tokens = stringToTranslate.split(TOKENIZE);  /* splits each word by the TOKENIZE string */
+        readDict(); /* Reads the csv file to the dict hash map */
+        String[] tokens = stringToTranslate.split(TOKENIZE);  /* Splits each word by the TOKENIZE string */
 
-        for (String token : tokens) { /* iterates through all elements in tokens array and calls the translate */
+        for (String token : tokens) { /* Iterates through all elements in tokens array and calls the translate */
             translate(token);          /* function to translate the elements to Spanish if possible */
         }
 
-        new rule(translatedTokens); /* new rule object in order to enforce all grammar rules on translatedTokens */
-        printTokens(); /* prints the tokens to the console */
-        System.out.print("\n");
+        new rule(translatedTokens); /* New rule object in order to enforce all grammar rules on translatedTokens */
+        printTokens(); /* Prints the tokens to the console */
+        System.out.print("\n"); /* New line for appropriate formatting */
     }
 
     /**
@@ -192,6 +200,8 @@ public class translate {
          * A token is valid if it is a *valid* plural form of a word in the dictionary
          * A token is valid if it is a *valid* upper-case, plural form of a word in the dictionary
          * A token is valid if it has a Levenshtein distance of 1 with some word in the dictionary
+         * A token is valid if its lower-case form has a Levenshtein distance of 1 with some
+         * word in the dictionary
          * --------------------------------------------------------------------------------------
          * If none of these conditions are met, then the token is not not valid; indicating that the user
          * has inputted some garbage.
