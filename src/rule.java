@@ -199,6 +199,7 @@ class rule {
      * Spanish usually drops pronouns with es/est*** forms, hence this method enforces this rule (rule 7)
      */
     private void dropPronouns() {
+        /* Array List of values that allow a pronoun following them to be dropped */
         ArrayList<String> pronounList = new ArrayList<>();
         pronounList.add("es");
         pronounList.add("estoy");
@@ -211,6 +212,12 @@ class rule {
         pronounList.add("somos");
         pronounList.add("soy");
 
+        /**
+         * The following block of code iterates through translatedTokens, and if
+         * it finds two adjacent words where the type of the first word is a pronoun
+         * and pronounList contains the name of the second word, the pronoun will be removed
+         * from the array list; hence dropped.
+         */
         for (int i = 0; i < translatedTokens.size() - 1; i++) {
             if (translatedTokens.get(i).getType().equals("pronoun") && pronounList.contains(translatedTokens.get(i + 1).getName())) {
                 translatedTokens.remove(i);
@@ -223,7 +230,6 @@ class rule {
 
     /**
      * Method that swaps a token with the token that is in front of it (in front of being the position of the token + 1)
-     *
      * @param name     the name of token that needs to be swapped
      * @param type     the type of the token that needs to be swapped
      * @param position the position of the token within the translatedTokens array list
@@ -265,6 +271,14 @@ class rule {
      * Method that checks if the sentence contains some negation, and if so, enforces rule 9
      */
     private void negation() {
+        /**
+         * The following block code iterates through the translatedTokens
+         * array list and checks if the field attribute name of a word object
+         * within the array list is equal to "no"; if so, this indicates that
+         * the word following it is a verb. Therefore, we get the neg and
+         * verb objects and swap them around.
+         *
+         */
         for (int i = 1; i < translatedTokens.size() - 1; i++) {
             if (translatedTokens.get(i).getName().equals("no")) {
                 word neg, verb;
@@ -284,6 +298,24 @@ class rule {
      * so this method ensures this rule is followed (rule 10).
      */
     private void replacements() {
+
+        /**
+         * The following block of code determines whether objects within the array list
+         * meet the criteria to be replaced, and if so, replaces them with their
+         * corresponding replacement values; the conditions that the objects must meet
+         * in order to be replaced are listed below
+         * ----------------------------------------------------------------------------
+         *
+         * con tú --> contigo
+         * con yo --> conmigo
+         * preposition tú --> preposition ti
+         *
+         * ----------------------------------------------------------------------------
+         * Hence, the block of code iterates through all elements of translatedTokens
+         * and checks if a value at position i and another value at position (i+1) meets
+         * the above conditions.
+         */
+
         for (int i = 0; i < translatedTokens.size() - 1; i++) {
             if (translatedTokens.get(i).getName().equals("con") && translatedTokens.get(i + 1).getName().equals("tú")) {
                 translatedTokens.get(i).setName("contigo");

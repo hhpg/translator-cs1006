@@ -53,7 +53,6 @@ public class translate {
         Scanner sc = new Scanner(System.in); /* scanner instance to get input */
         String input = sc.nextLine(); /* gets user input */
         new translate(input);
-
     }
 
     /**
@@ -121,7 +120,6 @@ public class translate {
         for (String token : tokens) { /* Iterates through all elements in tokens array and calls the translate */
             translate(token);          /* function to translate the elements to Spanish if possible */
         }
-
         new rule(translatedTokens); /* New rule object in order to enforce all grammar rules on translatedTokens */
         printTokens(); /* Prints the tokens to the console */
         System.out.print("\n"); /* New line for appropriate formatting */
@@ -167,7 +165,6 @@ public class translate {
             } else {
                 System.out.print(translatedTokens.get(i).getName());
             }
-
         }
     }
 
@@ -263,8 +260,6 @@ public class translate {
             translatedTokens.add(x);
             return;
         }
-
-
     }
 
     /**
