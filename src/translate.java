@@ -29,7 +29,7 @@ public class translate {
          */
         if (!stringToTranslate.isEmpty()) {
             this.stringToTranslate = stringToTranslate;
-            getInput();
+            doTranslation();
         }
     }
 
@@ -68,7 +68,7 @@ public class translate {
          * by a comma in each line; since the standard delimiter in a csv file is a
          * comma. To keep count of which word is being read, a counter is implemented;
          * where the counter has 3 possible values; 0, 1 and 2. The value 0 indicates
-         * that the English word is being read, the value 1 indicates that the corresponding
+         * that the English word is being read, the value 1 indicates that the correspondingd
          * Spanish word is being read and the value 2 indicates that the grammar type of the
          * word is being read.
          *
@@ -108,7 +108,7 @@ public class translate {
      *
      * @throws IOException if the .csv file is not found
      */
-    private void getInput() throws IOException {
+    private void doTranslation() throws IOException {
 
         readDict(); /* Reads the csv file to the dict hash map */
         String[] tokens = stringToTranslate.split(TOKENIZE);  /* Splits each word by the TOKENIZE string */
@@ -344,7 +344,6 @@ public class translate {
         }
         return null;
     }
-
 
     /**
      * Method that determines if the given String ends with a vowel or a
